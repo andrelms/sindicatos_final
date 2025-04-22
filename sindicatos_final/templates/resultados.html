@@ -1,0 +1,366 @@
+{% extends "base.html" %}
+
+{% block title %}Resultados da Análise{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="header mb-4">
+        <h1 class="h2">Resultados da Análise</h1>
+        <p class="text-muted">Dados extraídos dos documentos processados</p>
+    </div>
+
+    <div class="controls mb-4">
+        <div class="row g-3">
+            <div class="col-md-6">
+                <div class="search-container">
+                    <i class="fas fa-search position-absolute ps-3" style="top: 50%; transform: translateY(-50%);"></i>
+                    <input type="text" id="search" class="form-control ps-5" placeholder="Buscar por sindicato, categoria, data...">
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="d-flex gap-2">
+                    <select id="filter-estado" class="form-select">
+                        <option value="todos">Todos os Estados</option>
+                    </select>
+                    <select id="filter-categoria" class="form-select">
+                        <option value="todas">Todas as Categorias</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Conteúdo de Resultados -->
+    <div class="resultados-container mt-4">
+        <div class="row" id="resultados-grid">
+            <!-- Os cards de resultados serão inseridos aqui dinamicamente -->
+        </div>
+    </div>
+
+    <!-- Loading State -->
+    <div id="loading-state" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Carregando...</span>
+        </div>
+        <p class="mt-2">Carregando resultados de análise...</p>
+    </div>
+
+    <!-- Empty State -->
+    <div id="empty-state" class="text-center py-5" style="display: none;">
+        <i class="fas fa-chart-line fa-3x text-muted mb-3"></i>
+        <h3>Nenhum resultado disponível</h3>
+        <p class="text-muted">Precisamos processar documentos para gerar resultados de análise.</p>
+        <a href="{{ url_for('arquivos') }}" class="btn btn-primary">
+            <i class="fas fa-upload me-2"></i>Carregar e Processar Documentos
+        </a>
+    </div>
+
+    <!-- Modal para detalhes -->
+    <div class="modal fade" id="detalheModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Detalhes do Resultado</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+                <div class="modal-body" id="detalhe-conteudo">
+                    <!-- Conteúdo será preenchido dinamicamente -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.resultados-container {
+    min-height: 300px;
+}
+
+.resultado-card {
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-color) 0px 2px 8px;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.resultado-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-color) 0px 8px 16px;
+}
+
+.resultado-header {
+    background: linear-gradient(135deg, var(--primary-gradient-start), var(--primary-gradient-end));
+    color: white;
+    padding: 1rem;
+}
+
+.resultado-header h3 {
+    font-size: 1.25rem;
+    margin: 0;
+    font-weight: 600;
+}
+
+.resultado-body {
+    padding: 1.5rem;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.resultado-footer {
+    padding: 1rem;
+    background-color: rgba(0, 0, 0, 0.03);
+    border-top: 1px solid var(--border-color);
+}
+
+.meta-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.75rem;
+}
+
+.meta-icon {
+    width: 20px;
+    margin-right: 10px;
+    color: var(--primary-color);
+}
+
+.search-container {
+    position: relative;
+}
+
+.search-container input {
+    padding-left: 2.5rem;
+    border-radius: 50px;
+}
+
+.controls select {
+    border-radius: 50px;
+}
+
+.valor-destacado {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--primary-color);
+    margin-top: auto;
+    padding-top: 1rem;
+}
+
+.valor-label {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    display: block;
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let carregarResultados;
+
+document.addEventListener('DOMContentLoaded', function() {
+    const resultadosGrid = document.getElementById('resultados-grid');
+    const loadingState = document.getElementById('loading-state');
+    const emptyState = document.getElementById('empty-state');
+    const searchInput = document.getElementById('search');
+    const filterEstado = document.getElementById('filter-estado');
+    const filterCategoria = document.getElementById('filter-categoria');
+    const detalheModal = new bootstrap.Modal(document.getElementById('detalheModal'));
+    const detalheConteudo = document.getElementById('detalhe-conteudo');
+
+    // Função para carregar resultados
+    carregarResultados = async function() {
+        try {
+            loadingState.style.display = 'block';
+            emptyState.style.display = 'none';
+            resultadosGrid.style.display = 'none';
+
+            // Obter dados de resultados
+            const response = await fetch('/api/resultados');
+            const data = await response.json();
+            
+            if (data.length === 0) {
+                loadingState.style.display = 'none';
+                emptyState.style.display = 'block';
+                return;
+            }
+
+            // Processar dados e criar cards
+            processarResultados(data);
+            
+            loadingState.style.display = 'none';
+            resultadosGrid.style.display = 'flex';
+        } catch (error) {
+            console.error('Erro ao carregar resultados:', error);
+            loadingState.style.display = 'none';
+            emptyState.style.display = 'block';
+        }
+    };
+
+    // Função para processar resultados
+    function processarResultados(data) {
+        resultadosGrid.innerHTML = ''; // Limpar grid
+        
+        // Agrupar por categoria
+        const categorias = {};
+        data.forEach(item => {
+            const categoria = item.clausula?.categoria || 'Sem Categoria';
+            if (!categorias[categoria]) {
+                categorias[categoria] = [];
+            }
+            categorias[categoria].push(item);
+        });
+
+        // Preencher select de estados
+        const estados = [...new Set(data.map(item => item.sindicato?.estado).filter(Boolean))].sort();
+        filterEstado.innerHTML = '<option value="todos">Todos os Estados</option>';
+        estados.forEach(estado => {
+            filterEstado.innerHTML += `<option value="${estado.toLowerCase()}">${estado}</option>`;
+        });
+
+        // Preencher select de categorias
+        const categoriasUnicas = Object.keys(categorias).sort();
+        filterCategoria.innerHTML = '<option value="todas">Todas as Categorias</option>';
+        categoriasUnicas.forEach(categoria => {
+            filterCategoria.innerHTML += `<option value="${categoria.toLowerCase()}">${categoria}</option>`;
+        });
+
+        // Criar cards para cada categoria
+        Object.entries(categorias).forEach(([categoria, items]) => {
+            // Calcular estatísticas básicas
+            const pisoSalarial = items.map(i => i.clausula?.piso_salarial).filter(Boolean);
+            const mediaPiso = pisoSalarial.length > 0 
+                ? pisoSalarial.reduce((a, b) => a + b, 0) / pisoSalarial.length 
+                : 0;
+            
+            const estados = [...new Set(items.map(i => i.sindicato?.estado).filter(Boolean))];
+            
+            const col = document.createElement('div');
+            col.className = 'col-md-6 col-lg-4 mb-4';
+            col.setAttribute('data-categoria', categoria.toLowerCase());
+            col.setAttribute('data-search', JSON.stringify(items).toLowerCase());
+            
+            const card = document.createElement('div');
+            card.className = 'resultado-card';
+            
+            card.innerHTML = `
+                <div class="resultado-header">
+                    <h3>${categoria}</h3>
+                </div>
+                <div class="resultado-body">
+                    <div class="meta-item">
+                        <div class="meta-icon"><i class="fas fa-building"></i></div>
+                        <div>${items.length} sindicato(s)</div>
+                    </div>
+                    <div class="meta-item">
+                        <div class="meta-icon"><i class="fas fa-map-marker-alt"></i></div>
+                        <div>${estados.length} estado(s): ${estados.slice(0, 3).join(', ')}${estados.length > 3 ? '...' : ''}</div>
+                    </div>
+                    ${mediaPiso > 0 ? `
+                    <div class="meta-item">
+                        <div class="meta-icon"><i class="fas fa-money-bill-wave"></i></div>
+                        <div>Piso salarial médio</div>
+                    </div>
+                    <div class="valor-destacado">
+                        <span class="valor-label">Média</span>
+                        R$ ${mediaPiso.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+                    </div>
+                    ` : ''}
+                </div>
+                <div class="resultado-footer">
+                    <button class="btn btn-primary btn-sm ver-detalhes" data-categoria="${categoria}">
+                        <i class="fas fa-search me-1"></i>Ver Detalhes
+                    </button>
+                </div>
+            `;
+            
+            // Adicionar evento para o botão de detalhes
+            card.querySelector('.ver-detalhes').addEventListener('click', () => {
+                mostrarDetalhes(categoria, items);
+            });
+            
+            col.appendChild(card);
+            resultadosGrid.appendChild(col);
+        });
+    }
+
+    // Função para mostrar detalhes
+    function mostrarDetalhes(categoria, items) {
+        // Preparar conteúdo
+        detalheConteudo.innerHTML = `
+            <div class="mb-4">
+                <h4>${categoria}</h4>
+                <p class="text-muted">Dados extraídos de ${items.length} sindicatos</p>
+            </div>
+            
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Sindicato</th>
+                            <th>Estado</th>
+                            <th>Cargo</th>
+                            <th>Piso Salarial</th>
+                            <th>Carga Horária</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${items.map(item => `
+                            <tr>
+                                <td>${item.sindicato?.nome || 'Não especificado'}</td>
+                                <td>${item.sindicato?.estado || 'N/A'}</td>
+                                <td>${item.clausula?.cargo || 'N/A'}</td>
+                                <td>${item.clausula?.piso_salarial ? 'R$ ' + item.clausula.piso_salarial.toLocaleString('pt-BR', {minimumFractionDigits: 2}) : 'N/A'}</td>
+                                <td>${item.clausula?.carga_horaria || 'N/A'}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            </div>
+        `;
+        
+        // Mostrar modal
+        detalheModal.show();
+    }
+
+    // Função de busca
+    function buscar() {
+        const searchTerm = searchInput.value.toLowerCase();
+        const estado = filterEstado.value;
+        const categoria = filterCategoria.value;
+
+        document.querySelectorAll('.col-md-6').forEach(col => {
+            const categoriaMatch = categoria === 'todas' || col.getAttribute('data-categoria') === categoria;
+            const searchMatch = col.getAttribute('data-search').includes(searchTerm);
+            const estadoMatch = estado === 'todos' || (estado !== 'todos' && col.getAttribute('data-search').includes(`"estado":"${estado}"`));
+
+            col.style.display = categoriaMatch && searchMatch && estadoMatch ? 'block' : 'none';
+        });
+    }
+
+    // Event listeners
+    searchInput.addEventListener('input', buscar);
+    filterEstado.addEventListener('change', buscar);
+    filterCategoria.addEventListener('change', buscar);
+
+    // Carregar dados iniciais
+    carregarResultados();
+});
+
+// Ouvinte para mudança de tema
+document.addEventListener('themeChanged', function() {
+    if (typeof carregarResultados === 'function') {
+        carregarResultados();
+    }
+});
+</script>
+{% endblock %}

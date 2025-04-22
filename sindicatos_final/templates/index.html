@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block hero %}
+<header class="hero-section">
+    <div class="container text-center">
+        <h1>Sistema de Automação de Sindicatos</h1>
+        <p>Automatize a extração, análise e atualização de dados de convenções e acordos coletivos de sindicatos utilizando IA.</p>
+        <div class="d-flex justify-content-center gap-3">
+            <a href="{{ url_for('arquivos') }}" class="btn btn-primary">
+                <i class="fas fa-upload me-2"></i>Carregar Arquivos
+            </a>
+            <a href="#recursos" class="btn btn-outline-light">
+                <i class="fas fa-info-circle me-2"></i>Saiba Mais
+            </a>
+        </div>
+    </div>
+</header>
+{% endblock %}
+
+{% block content %}
+<!-- Features Section -->
+<section id="recursos" class="py-5">
+    <div class="container">
+        <h2 class="text-center mb-5">Recursos Principais</h2>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="feature-card h-100">
+                    <div class="card-body text-center">
+                        <div class="feature-icon">
+                            <i class="fas fa-file-upload"></i>
+                        </div>
+                        <h3 class="h5 mt-4">Upload de Arquivos</h3>
+                        <p class="card-text">Carregue arquivos Excel ou PDF com dados dos sindicatos para processamento automatizado.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card h-100">
+                    <div class="card-body text-center">
+                        <div class="feature-icon">
+                            <i class="fas fa-robot"></i>
+                        </div>
+                        <h3 class="h5 mt-4">Processamento Inteligente</h3>
+                        <p class="card-text">Análise automática dos dados utilizando inteligência artificial para extração precisa.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card h-100">
+                    <div class="card-body text-center">
+                        <div class="feature-icon">
+                            <i class="fas fa-table"></i>
+                        </div>
+                        <h3 class="h5 mt-4">Painel de Dados</h3>
+                        <p class="card-text">Visualize e compare dados entre diferentes sindicatos, estados e categorias.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action -->
+<section class="py-5 bg-primary text-white rounded">
+    <div class="container text-center">
+        <h2 class="mb-4">Comece a usar agora</h2>
+        <p class="lead mb-4">Carregue seus arquivos e deixe a IA fazer o trabalho pesado.</p>
+        <a href="{{ url_for('arquivos') }}" class="btn btn-light btn-lg">
+            <i class="fas fa-rocket me-2"></i>Começar
+        </a>
+    </div>
+</section>
+{% endblock %}

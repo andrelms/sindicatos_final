@@ -1,0 +1,789 @@
+/* Estilos para o Sistema de Automação de Sindicatos */
+
+/* Variáveis do tema */
+:root {
+    /* Cores base - Tema Claro */
+    --primary-color: #4a89dc;
+    --primary-dark: #004c99;
+    --primary-light: #3399ff;
+    --primary-gradient-start: #0066cc;
+    --primary-gradient-end: #3399ff;
+    --primary-rgb: 0, 102, 204;
+    --secondary-color: #5d9cec;
+    --accent-color: #3c763d;
+    --text-color: #333333;
+    --text-muted: #666666;
+    --link-color: #0066cc;
+    --link-hover: #004c99;
+    --bg-color: #ffffff;
+    --card-bg: #ffffff;
+    --border-color: #ddd;
+    --input-bg: #fff;
+    --input-text: #333333;
+    --input-border: #ced4da;
+    --input-focus: #0066cc;
+    --shadow-color: rgba(0, 0, 0, 0.1);
+    --success-color: #28a745;
+    --warning-color: #ffc107;
+    --danger-color: #dc3545;
+    --info-color: #17a2b8;
+    --border-radius: 0.5rem;
+    --transition-speed: 0.3s;
+    --tab-transition: all 0.3s ease-in-out;
+    --chat-msg-bg: #f0f0f0;
+    --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --table-header-bg: #f5f7fa;
+    --table-hover: #f5f7fa;
+    --navbar-bg: #fff;
+    --navbar-color: #333;
+    --sidebar-bg: #f8f9fa;
+    --sidebar-active: #e9ecef;
+}
+
+/* Tema Escuro */
+body[data-theme="dark"] {
+    --primary-color: #5d9cec;
+    --primary-dark: #0066cc;
+    --primary-light: #66b3ff;
+    --primary-gradient-start: #004c99;
+    --primary-gradient-end: #0066cc;
+    --primary-rgb: 51, 153, 255;
+    --secondary-color: #4a89dc;
+    --accent-color: #5cb85c;
+    --text-color: #e2e2e2;
+    --text-muted: #999999;
+    --link-color: #3399ff;
+    --link-hover: #66b3ff;
+    --bg-color: #1e1e2e;
+    --card-bg: #2d2d3f;
+    --border-color: #444;
+    --input-bg: #3c3c50;
+    --input-text: #e1e1e1;
+    --input-border: #444;
+    --input-focus: #3399ff;
+    --shadow-color: rgba(0, 0, 0, 0.3);
+    --chat-msg-bg: #3d3d3d;
+    --hero-text: #ffffff;
+    --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    --table-hover: #3c3c50;
+    --navbar-bg: #2d2d3f;
+    --navbar-color: #e2e2e2;
+    --sidebar-bg: #2d2d3f;
+    --sidebar-active: #3c3c50;
+}
+
+/* Tema Escuro (compatibilidade) */
+body.dark-theme {
+    --primary-color: #3399ff;
+    --primary-dark: #0066cc;
+    --primary-light: #66b3ff;
+    --primary-gradient-start: #004c99;
+    --primary-gradient-end: #0066cc;
+    --primary-rgb: 51, 153, 255;
+    --secondary-color: #0066cc;
+    --accent-color: #ff6600;
+    --text-color: #e1e1e1;
+    --text-muted: #999999;
+    --link-color: #3399ff;
+    --link-hover: #66b3ff;
+    --bg-color: #1a1a1a;
+    --card-bg: #2d2d2d;
+    --border-color: #404040;
+    --input-bg: #333333;
+    --input-text: #e1e1e1;
+    --input-border: #404040;
+    --input-focus: #3399ff;
+    --shadow-color: rgba(0, 0, 0, 0.3);
+    --chat-msg-bg: #3d3d3d;
+    --hero-text: #ffffff;
+    --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    --table-hover: #3c3c50;
+    --navbar-bg: #2d2d3f;
+    --navbar-color: #e2e2e2;
+    --sidebar-bg: #2d2d3f;
+    --sidebar-active: #3c3c50;
+}
+
+/* Estilos Globais */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    transition: background-color var(--transition-speed), color var(--transition-speed);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+}
+
+main {
+    flex: 1;
+}
+
+/* Theme Toggle Button */
+.theme-toggle {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+    padding: 10px;
+    border-radius: 50%;
+    cursor: pointer;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 5px var(--shadow-color);
+    transition: transform 0.3s ease, background-color var(--transition-speed), color var(--transition-speed);
+    outline: none;
+}
+
+.theme-toggle:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 8px var(--shadow-color);
+}
+
+.theme-toggle:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.4), 0 2px 5px var(--shadow-color);
+}
+
+.theme-toggle i {
+    transition: transform 0.3s ease;
+    font-size: 1.2rem;
+}
+
+body[data-theme="dark"] .theme-toggle {
+    background: var(--card-bg);
+    color: var(--text-color);
+    border-color: var(--border-color);
+}
+
+/* Animação para troca de tema */
+@keyframes rotate-icon {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.theme-toggle:active i {
+    animation: rotate-icon 0.5s ease;
+}
+
+.page-header {
+    border-bottom: 1px solid var(--border-color);
+}
+
+.page-title {
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+/* Hero Section */
+.hero-section {
+    background: linear-gradient(135deg, var(--primary-gradient-start), var(--primary-gradient-end));
+    background-size: cover;
+    background-position: center;
+    color: white !important;
+    padding: 5rem 0;
+    margin-bottom: 2rem;
+    border-radius: 0;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+}
+
+.hero-section h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: white !important;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.hero-section p {
+    font-size: 1.2rem;
+    margin-bottom: 2rem;
+    color: white !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Garantir que o tema escuro não afete o estilo do hero */
+[data-theme="dark"] .hero-section {
+    background: linear-gradient(135deg, var(--primary-gradient-start), var(--primary-gradient-end));
+    color: white !important;
+}
+
+[data-theme="dark"] .hero-section h1,
+[data-theme="dark"] .hero-section p {
+    color: white !important;
+}
+
+/* Botões do hero */
+.hero-section .btn {
+    padding: 0.6rem 1.5rem;
+    font-weight: 600;
+    border-radius: 50px;
+    margin: 0 0.5rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.hero-section .btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.hero-section .btn-primary {
+    background-color: white;
+    color: var(--primary-color);
+    border-color: white;
+}
+
+.hero-section .btn-primary:hover {
+    background-color: rgba(255, 255, 255, 0.9);
+    color: var(--primary-dark);
+}
+
+.hero-section .btn-outline-light {
+    border-color: white;
+    color: white;
+}
+
+.hero-section .btn-outline-light:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.hero-image-container {
+    position: relative;
+    overflow: hidden;
+    border-radius: 0.5rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+/* Features Section */
+.feature-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    background-color: var(--primary-color);
+    color: white;
+    z-index: 1;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+.feature-card:hover .feature-icon {
+    transform: scale(1.1);
+}
+
+/* Certifique-se de que os ícones Font Awesome estão visíveis */
+.feature-icon i {
+    font-size: 2.5rem !important;
+    line-height: 1;
+    display: inline-block;
+    color: white !important;
+}
+
+/* Garante que as feature cards tenham altura correta */
+.feature-card {
+    height: 100%;
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius);
+    transition: all 0.3s ease;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+}
+
+/* Certifique-se que o card-body ocupa todo o espaço */
+.feature-card .card-body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1.5rem;
+    flex: 1;
+}
+
+/* Chat Widget */
+.chat-widget {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1000;
+}
+
+.chat-button {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: var(--primary-color);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    transition: all 0.3s ease;
+}
+
+.chat-button:hover {
+    background-color: var(--primary-dark);
+    transform: scale(1.05);
+}
+
+.chat-popup {
+    position: absolute;
+    bottom: 80px;
+    right: 0;
+    width: 350px;
+    height: 450px;
+    background-color: var(--card-bg);
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+}
+
+.chat-header {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.chat-messages {
+    flex: 1;
+    padding: 15px;
+    overflow-y: auto;
+    background-color: var(--card-bg);
+}
+
+.message {
+    margin-bottom: 15px;
+    display: flex;
+    flex-direction: column;
+}
+
+.message.user {
+    align-items: flex-end;
+}
+
+.message.bot {
+    align-items: flex-start;
+}
+
+.message-content {
+    padding: 10px 15px;
+    border-radius: 18px;
+    max-width: 80%;
+}
+
+.message.user .message-content {
+    background-color: var(--primary-color);
+    color: white;
+    border-bottom-right-radius: 5px;
+}
+
+.message.bot .message-content {
+    background-color: var(--chat-msg-bg);
+    color: var(--text-color);
+    border-bottom-left-radius: 5px;
+}
+
+.chat-input {
+    display: flex;
+    padding: 10px;
+    border-top: 1px solid #eee;
+}
+
+.chat-input input {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    margin-right: 10px;
+    background-color: var(--input-bg);
+    color: var(--input-text);
+}
+
+.chat-input button {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+/* Placeholder para imagens em demonstração */
+.placeholder-img {
+    background-color: var(--card-bg);
+    border: 1px dashed var(--border-color);
+    height: 300px;
+    border-radius: 0.25rem;
+}
+
+/* Status indicator */
+.status-indicator {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}
+
+/* Log container */
+.log-container {
+    max-height: 300px;
+    overflow-y: auto;
+    background-color: var(--card-bg);
+    color: var(--text-color);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .hero-section {
+        padding: 3rem 0;
+    }
+    
+    .chat-popup {
+        width: 300px;
+        height: 400px;
+        bottom: 70px;
+    }
+}
+
+/* Navbar */
+.navbar {
+    background: linear-gradient(135deg, var(--primary-gradient-start), var(--primary-gradient-end));
+    color: white;
+    box-shadow: 0 2px 4px var(--shadow-color);
+    padding: 0.75rem 1rem;
+    transition: all 0.3s ease;
+    z-index: 100;
+}
+
+.navbar-dark .navbar-brand,
+.navbar-dark .navbar-nav .nav-link {
+    color: rgba(255, 255, 255, 0.95);
+}
+
+.navbar-dark .navbar-nav .nav-link:hover,
+.navbar-dark .navbar-nav .nav-link.active {
+    color: #ffffff;
+}
+
+.navbar-dark .navbar-nav .nav-link {
+    transition: color 0.2s ease, transform 0.2s ease;
+    padding: 0.8rem 1rem;
+    position: relative;
+}
+
+.navbar-dark .navbar-nav .nav-link:hover {
+    transform: translateY(-2px);
+}
+
+/* Efeito de sublinhado para link ativo */
+.navbar-dark .navbar-nav .nav-link.active::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 10%;
+    width: 80%;
+    height: 3px;
+    background-color: #ffffff;
+    border-radius: 3px 3px 0 0;
+}
+
+/* Garantir que o tema escuro não afete o estilo da navbar */
+[data-theme="dark"] .navbar {
+    background: linear-gradient(135deg, var(--primary-gradient-start), var(--primary-gradient-end));
+}
+
+[data-theme="dark"] .navbar-dark .navbar-brand,
+[data-theme="dark"] .navbar-dark .navbar-nav .nav-link {
+    color: rgba(255, 255, 255, 0.95);
+}
+
+[data-theme="dark"] .navbar-dark .navbar-nav .nav-link:hover,
+[data-theme="dark"] .navbar-dark .navbar-nav .nav-link.active {
+    color: #ffffff;
+}
+
+.navbar-brand {
+    font-weight: 700;
+    transition: transform 0.2s ease;
+}
+
+.navbar-brand:hover {
+    transform: scale(1.05);
+}
+
+/* Responsividade da navegação */
+@media (max-width: 992px) {
+    .navbar-nav {
+        padding: 0.5rem 0;
+    }
+    
+    .navbar-dark .navbar-nav .nav-link {
+        padding: 0.5rem 0.75rem;
+        border-left: 3px solid transparent;
+    }
+    
+    .navbar-dark .navbar-nav .nav-link::after {
+        display: none;
+    }
+    
+    .navbar-dark .navbar-nav .nav-link.active,
+    .navbar-dark .navbar-nav .nav-link:hover {
+        border-left-color: #ffffff;
+        transform: translateX(3px);
+    }
+}
+
+/* Estilo para abas e conteúdos de navegação */
+.nav-tabs {
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 1.5rem;
+    transition: border-color var(--transition-speed);
+}
+
+.nav-tabs .nav-link {
+    border: none;
+    color: var(--text-color);
+    position: relative;
+    transition: var(--tab-transition);
+    margin-right: 0.5rem;
+    padding: 0.75rem 1rem;
+    border-radius: var(--border-radius) var(--border-radius) 0 0;
+}
+
+.nav-tabs .nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background-color: transparent;
+    transition: var(--tab-transition);
+}
+
+.nav-tabs .nav-link:hover {
+    color: var(--primary-color);
+    background-color: rgba(var(--primary-rgb), 0.05);
+}
+
+.nav-tabs .nav-link.active {
+    color: var(--primary-color);
+    background-color: transparent;
+    font-weight: 600;
+}
+
+.nav-tabs .nav-link.active::after {
+    background-color: var(--primary-color);
+}
+
+/* Correções específicas para tema escuro nas abas */
+[data-theme="dark"] .nav-tabs {
+    border-bottom-color: rgba(255, 255, 255, 0.2);
+}
+
+[data-theme="dark"] .nav-tabs .nav-link {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+[data-theme="dark"] .nav-tabs .nav-link:hover {
+    color: var(--primary-light);
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .nav-tabs .nav-link.active {
+    color: var(--primary-light);
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.tab-content {
+    transition: opacity 0.3s ease;
+}
+
+.tab-pane {
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.tab-pane.show.active {
+    opacity: 1;
+}
+
+/* Transição de conteúdo entre abas */
+.content-transition {
+    transition: opacity 0.3s ease-in-out;
+}
+
+/* Correções do tema para elementos específicos */
+[data-theme="dark"] .table {
+    color: var(--text-color);
+}
+
+[data-theme="dark"] .table-hover tbody tr:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+[data-theme="dark"] .form-control {
+    background-color: var(--input-bg);
+    color: var(--input-text);
+    border-color: var(--input-border);
+}
+
+[data-theme="dark"] .modal-content,
+[data-theme="dark"] .card {
+    background-color: var(--card-bg);
+    border-color: var(--border-color);
+}
+
+[data-theme="dark"] .dropdown-menu {
+    background-color: var(--card-bg);
+    border-color: var(--border-color);
+}
+
+[data-theme="dark"] .dropdown-item {
+    color: var(--text-color);
+}
+
+[data-theme="dark"] .dropdown-item:hover {
+    background-color: rgba(var(--primary-rgb), 0.1);
+}
+
+/* Responsividade nos cards e containers */
+@media (max-width: 768px) {
+    .card {
+        margin-bottom: 1rem;
+    }
+    
+    .container {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+    
+    .hero-section {
+        padding: 2rem 0;
+    }
+    
+    .chat-popup {
+        width: 100%;
+        height: 100%;
+        bottom: 0;
+        right: 0;
+        border-radius: 0;
+    }
+}
+
+/* Melhoria na animação para elementos que aparecem/desaparecem */
+.collapse {
+    transition: all 0.3s ease;
+}
+
+/* Footer */
+.footer {
+    background-color: var(--card-bg);
+    color: var(--text-color);
+    padding: 2rem 0;
+    border-top: 1px solid var(--border-color);
+    margin-top: 2rem;
+}
+
+/* Ícones específicos para recursos */
+.feature-icon.automation-icon {
+    background-color: #4285f4;
+}
+
+.feature-icon.rag-icon {
+    background-color: #ea4335;
+}
+
+.feature-icon.visualization-icon {
+    background-color: #34a853;
+}
+
+/* Botão de chat flutuante para RAG */
+.rag-chat-button {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: var(--primary-color);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    z-index: 1000;
+    transition: all 0.3s ease;
+}
+
+.rag-chat-button:hover {
+    transform: scale(1.1);
+    background-color: var(--primary-dark);
+}
+
+.rag-chat-button i {
+    font-size: 1.5rem;
+}
+
+/* Animação de transição entre abas */
+.tab-pane {
+    animation: fadeEffect 0.5s;
+}
+
+@keyframes fadeEffect {
+    from {opacity: 0;}
+    to {opacity: 1;}
+}
+
+/* Melhorias para ícones */
+.fas, .fab, .far {
+    display: inline-block !important;
+    font-style: normal !important;
+    font-variant: normal !important;
+    text-rendering: auto !important;
+    line-height: 1 !important;
+}
+
+/* Garantir que os ícones sejam visíveis */
+.feature-icon i.fas.fa-robot {
+    font-size: 2.5rem !important;
+    color: white !important;
+}
+
+.feature-icon i.fas.fa-brain {
+    font-size: 2.5rem !important;
+    color: white !important;
+}
+
+.feature-icon i.fas.fa-chart-bar {
+    font-size: 2.5rem !important;
+    color: white !important;
+}

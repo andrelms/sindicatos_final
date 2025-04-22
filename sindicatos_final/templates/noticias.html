@@ -1,0 +1,189 @@
+{% extends "base.html" %}
+
+{% block title %}Feed de Notícias - Sistema de Automação de Sindicatos{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col">
+            <h1 class="h2">Feed de Notícias</h1>
+            <p class="text-muted">Acompanhe as últimas notícias relacionadas a sindicatos e acordos coletivos</p>
+        </div>
+        <div class="col-auto">
+            <button id="limparFeed" class="btn btn-danger">
+                <i class="fas fa-trash-alt me-2"></i>Limpar Feed
+            </button>
+        </div>
+    </div>
+
+    <!-- Loading State -->
+    <div id="loading" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Carregando...</span>
+        </div>
+        <p class="mt-2">Buscando notícias...</p>
+    </div>
+
+    <!-- Empty State -->
+    <div id="emptyState" class="text-center py-5" style="display: none;">
+        <i class="fas fa-newspaper fa-3x text-muted mb-3"></i>
+        <h3>Nenhuma notícia encontrada</h3>
+        <p class="text-muted">O feed será atualizado automaticamente quando novas notícias forem encontradas.</p>
+    </div>
+
+    <!-- Feed Container -->
+    <div id="feedContainer" class="row g-4">
+        <!-- As notícias serão inseridas aqui dinamicamente -->
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.news-card {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-color) 0px 2px 8px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    height: 100%;
+}
+
+.news-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-color) 0px 8px 16px;
+}
+
+.news-card .card-body {
+    padding: 1.5rem;
+}
+
+.news-card .card-title {
+    color: var(--text-color);
+    font-size: 1.25rem;
+    margin-bottom: 0.75rem;
+}
+
+.news-card .card-text {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+.news-card .card-footer {
+    background-color: var(--card-bg);
+    border-top: 1px solid var(--border-color);
+    padding: 1rem 1.5rem;
+}
+
+.news-card .source-link {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+}
+
+.news-card .source-link i {
+    margin-left: 0.5rem;
+    transition: transform 0.3s ease;
+}
+
+.news-card .source-link:hover i {
+    transform: translateX(5px);
+}
+
+.news-card .date {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.feed-item {
+    animation: fadeIn 0.3s ease-out forwards;
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const feedContainer = document.getElementById('feedContainer');
+    const loading = document.getElementById('loading');
+    const emptyState = document.getElementById('emptyState');
+    const limparFeedBtn = document.getElementById('limparFeed');
+
+    function carregarNoticias() {
+        loading.style.display = 'block';
+        emptyState.style.display = 'none';
+        feedContainer.style.display = 'none';
+
+        fetch('/api/noticias')
+            .then(response => response.json())
+            .then(noticias => {
+                loading.style.display = 'none';
+                
+                if (noticias.length === 0) {
+                    emptyState.style.display = 'block';
+                    return;
+                }
+
+                feedContainer.style.display = 'flex';
+                feedContainer.innerHTML = noticias.map((noticia, index) => `
+                    <div class="col-md-6 col-lg-4 feed-item" style="animation-delay: ${index * 0.1}s">
+                        <div class="news-card">
+                            <div class="card-body">
+                                <h5 class="card-title">${noticia.titulo}</h5>
+                                <p class="card-text">${noticia.descricao}</p>
+                            </div>
+                            <div class="card-footer">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="date">${new Date(noticia.data_publicacao).toLocaleDateString('pt-BR')}</span>
+                                    <a href="${noticia.url}" target="_blank" class="source-link">
+                                        Ver notícia <i class="fas fa-arrow-right"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            })
+            .catch(error => {
+                console.error('Erro ao carregar notícias:', error);
+                loading.style.display = 'none';
+                emptyState.style.display = 'block';
+            });
+    }
+
+    limparFeedBtn.addEventListener('click', function() {
+        if (confirm('Tem certeza que deseja limpar o feed de notícias?')) {
+            fetch('/api/noticias/limpar', {
+                method: 'POST'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Feed de notícias limpo com sucesso!');
+                    carregarNoticias();
+                } else {
+                    alert('Erro ao limpar feed: ' + data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Erro:', error);
+                alert('Erro ao limpar feed de notícias');
+            });
+        }
+    });
+
+    // Carregar notícias iniciais
+    carregarNoticias();
+
+    // Atualizar a cada 5 minutos
+    setInterval(carregarNoticias, 5 * 60 * 1000);
+});
+</script>
+{% endblock %}

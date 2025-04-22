@@ -1,0 +1,273 @@
+{% extends "base.html" %}
+
+{% block title %}Visualizando Arquivo - {{ arquivo.nome }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-md-12 mb-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <h1 class="h2 mb-0">
+                    {% if arquivo.tipo.lower() == 'pdf' %}
+                    <i class="fas fa-file-pdf text-danger me-2"></i>
+                    {% elif arquivo.tipo.lower() == 'excel' %}
+                    <i class="fas fa-file-excel text-success me-2"></i>
+                    {% else %}
+                    <i class="fas fa-file text-primary me-2"></i>
+                    {% endif %}
+                    {{ arquivo.nome }}
+                </h1>
+                <a href="{{ url_for('arquivos') }}" class="btn btn-outline-primary">
+                    <i class="fas fa-arrow-left me-2"></i>Voltar
+                </a>
+            </div>
+            <hr>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Informações do Arquivo</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span><i class="fas fa-file-alt me-2"></i>Tipo:</span>
+                            <span class="badge bg-primary">{{ arquivo.tipo.upper() }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span><i class="fas fa-weight me-2"></i>Tamanho:</span>
+                            <span>{{ arquivo.tamanho_formatado }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span><i class="fas fa-calendar-alt me-2"></i>Data Upload:</span>
+                            <span>{{ arquivo.data_upload }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span><i class="fas fa-tasks me-2"></i>Status:</span>
+                            {% if arquivo.processado %}
+                            <span class="badge bg-success">Processado</span>
+                            {% else %}
+                            <span class="badge bg-warning text-dark">Não Processado</span>
+                            {% endif %}
+                        </li>
+                    </ul>
+                </div>
+                <div class="card-footer bg-white">
+                    <div class="d-grid gap-2">
+                        {% if not arquivo.processado %}
+                        <button class="btn btn-success processar-btn" id="processarBtn" data-id="{{ arquivo.id }}" data-tipo="{{ arquivo.tipo }}">
+                            <i class="fas fa-play me-2"></i>Processar Arquivo
+                        </button>
+                        {% else %}
+                        <a href="{{ url_for('resultados') }}?arquivo_id={{ arquivo.id }}" class="btn btn-primary">
+                            <i class="fas fa-search me-2"></i>Ver Resultados
+                        </a>
+                        {% endif %}
+                        <button class="btn btn-danger" id="excluirBtn" data-id="{{ arquivo.id }}">
+                            <i class="fas fa-trash me-2"></i>Excluir Arquivo
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header">
+                    <h5 class="mb-0">Visualização</h5>
+                </div>
+                <div class="card-body">
+                    {% if arquivo.tipo.lower() == 'pdf' %}
+                    <div class="ratio ratio-16x9 mb-3">
+                        <embed src="{{ url_for('uploaded_file', filename=arquivo.nome) }}" type="application/pdf" width="100%" height="600px" />
+                    </div>
+                    <div class="d-grid">
+                        <a href="{{ url_for('uploaded_file', filename=arquivo.nome) }}" class="btn btn-outline-primary" target="_blank">
+                            <i class="fas fa-external-link-alt me-2"></i>Abrir em Nova Aba
+                        </a>
+                    </div>
+                    {% elif arquivo.tipo.lower() == 'excel' %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Arquivos Excel não podem ser visualizados diretamente no navegador. Utilize o botão abaixo para baixar o arquivo.
+                    </div>
+                    <div class="d-grid">
+                        <a href="{{ url_for('uploaded_file', filename=arquivo.nome) }}" class="btn btn-success" download>
+                            <i class="fas fa-download me-2"></i>Baixar Excel
+                        </a>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Tipo de arquivo não suportado para visualização direta.
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Confirmação -->
+<div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmModalLabel">Confirmar Exclusão</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+            <div class="modal-body">
+                <p>Tem certeza que deseja excluir este arquivo? Esta ação não pode ser desfeita.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Excluir</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const processarBtn = document.getElementById('processarBtn');
+    const excluirBtn = document.getElementById('excluirBtn');
+    const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+    const confirmModal = new bootstrap.Modal(document.getElementById('confirmModal'));
+    
+    let fileToDelete = null;
+    
+    // Botão de processar arquivo
+    if (processarBtn) {
+        processarBtn.addEventListener('click', function() {
+            const arquivoId = this.getAttribute('data-id');
+            const arquivoTipo = this.getAttribute('data-tipo');
+            
+            // Desabilitar botão e mostrar loading
+            this.disabled = true;
+            this.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Processando...';
+            
+            // Fazer requisição para processar o arquivo
+            fetch(`/api/arquivos/${arquivoId}/processar`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Mostrar notificação de sucesso
+                    showNotification('success', 'Arquivo processado com sucesso');
+                    
+                    // Recarregar a página após 2 segundos
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 2000);
+                } else {
+                    // Reabilitar botão
+                    this.disabled = false;
+                    this.innerHTML = '<i class="fas fa-play me-2"></i>Processar Arquivo';
+                    
+                    // Mostrar notificação de erro
+                    showNotification('error', data.message || 'Erro ao processar arquivo');
+                }
+            })
+            .catch(error => {
+                console.error('Erro:', error);
+                
+                // Reabilitar botão
+                this.disabled = false;
+                this.innerHTML = '<i class="fas fa-play me-2"></i>Processar Arquivo';
+                
+                // Mostrar notificação de erro
+                showNotification('error', 'Erro ao processar arquivo');
+            });
+        });
+    }
+    
+    // Botão de excluir arquivo
+    if (excluirBtn) {
+        excluirBtn.addEventListener('click', function() {
+            fileToDelete = this.getAttribute('data-id');
+            confirmModal.show();
+        });
+    }
+    
+    // Botão de confirmar exclusão
+    if (confirmDeleteBtn) {
+        confirmDeleteBtn.addEventListener('click', function() {
+            if (fileToDelete) {
+                // Fazer requisição para excluir o arquivo
+                fetch(`/api/arquivos/${fileToDelete}`, {
+                    method: 'DELETE'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Mostrar notificação de sucesso
+                    showNotification('success', 'Arquivo excluído com sucesso');
+                    
+                    // Redirecionar para a página de arquivos após 2 segundos
+                    setTimeout(() => {
+                        window.location.href = "{{ url_for('arquivos') }}";
+                    }, 2000);
+                    
+                    // Fechar modal
+                    confirmModal.hide();
+                })
+                .catch(error => {
+                    console.error('Erro:', error);
+                    
+                    // Mostrar notificação de erro
+                    showNotification('error', 'Erro ao excluir arquivo');
+                    
+                    // Fechar modal
+                    confirmModal.hide();
+                });
+            }
+        });
+    }
+    
+    // Função para mostrar notificação
+    function showNotification(type, message) {
+        // Verificar se o container de notificações existe
+        let container = document.querySelector('.notification-container');
+        if (!container) {
+            container = document.createElement('div');
+            container.className = 'notification-container';
+            document.body.appendChild(container);
+        }
+        
+        // Criar notificação
+        const notification = document.createElement('div');
+        notification.className = `notification ${type}`;
+        notification.innerHTML = `
+            <div class="notification-icon">
+                <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+            </div>
+            <div class="notification-message">${message}</div>
+        `;
+        
+        // Adicionar ao container
+        container.appendChild(notification);
+        
+        // Mostrar com animação
+        setTimeout(() => {
+            notification.classList.add('show');
+        }, 10);
+        
+        // Remover após 5 segundos
+        setTimeout(() => {
+            notification.classList.remove('show');
+            setTimeout(() => {
+                notification.remove();
+            }, 300);
+        }, 5000);
+    }
+});
+</script>
+{% endblock %} 

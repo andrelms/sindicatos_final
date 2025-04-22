@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}Página Inicial - Aplicação Flask{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h2 class="text-center">Bem-vindo à Aplicação Flask</h2>
+            </div>
+            <div class="card-body">
+                <p class="lead text-center">Esta aplicação está com o tema claro ativado por padrão.</p>
+                <p class="text-center">Você pode alterar para o tema escuro clicando no botão no canto superior direito.</p>
+                
+                <div class="text-center mt-4">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title">Tema Claro</h5>
+                                    <p class="card-text">O tema claro é o padrão da aplicação, com fundo branco e texto escuro.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title">Tema Escuro</h5>
+                                    <p class="card-text">O tema escuro muda o fundo para escuro e o texto para claro para reduzir o cansaço visual.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Aplicação Flask{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h1 class="h2">Dashboard</h1>
+            <p class="text-muted">Visão geral da aplicação</p>
+        </div>
+    </div>
+    
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Total de Arquivos</h5>
+                    <p class="display-4">{{ total_arquivos }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Arquivos Processados</h5>
+                    <p class="display-4">{{ processados }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Em Processamento</h5>
+                    <p class="display-4">{{ em_processamento }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">Aplicação com Tema Claro</h5>
+                </div>
+                <div class="card-body">
+                    <p>Esta aplicação está utilizando o tema claro por padrão.</p>
+                    <p>Você pode alternar para o tema escuro usando o botão no canto superior direito.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

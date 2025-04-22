@@ -1,0 +1,537 @@
+{% extends "base.html" %}
+
+{% block title %}Administração - Sistema de Automação de Sindicatos{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="header mb-4">
+        <h1 class="h2">Painel de Administração</h1>
+        <p class="text-muted">Gerencie as configurações e dados do sistema</p>
+    </div>
+
+    <!-- Cards de Ações Rápidas -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-4">
+            <div class="action-card">
+                <div class="action-icon bg-primary">
+                    <i class="fas fa-database"></i>
+                </div>
+                <div class="action-content">
+                    <h4>Banco de Dados</h4>
+                    <p class="text-muted">Gerencie os dados do sistema</p>
+                    <button class="btn btn-primary mt-2" data-bs-toggle="modal" data-bs-target="#dbModal">
+                        <i class="fas fa-cog me-2"></i>Gerenciar
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="action-card">
+                <div class="action-icon bg-success">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <div class="action-content">
+                    <h4>Automação</h4>
+                    <p class="text-muted">Configure processos automáticos</p>
+                    <button class="btn btn-success mt-2" data-bs-toggle="modal" data-bs-target="#autoModal">
+                        <i class="fas fa-cog me-2"></i>Configurar
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="action-card">
+                <div class="action-icon bg-info">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <div class="action-content">
+                    <h4>Relatórios</h4>
+                    <p class="text-muted">Exporte dados e relatórios</p>
+                    <button class="btn btn-info mt-2" data-bs-toggle="modal" data-bs-target="#reportsModal">
+                        <i class="fas fa-download me-2"></i>Exportar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Seção de Logs -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h5 class="card-title mb-0">Logs do Sistema</h5>
+                <div class="btn-group">
+                    <button class="btn btn-outline-primary" id="refreshLogs">
+                        <i class="fas fa-sync-alt me-2"></i>Atualizar
+                    </button>
+                    <button class="btn btn-outline-danger" id="clearLogs">
+                        <i class="fas fa-trash-alt me-2"></i>Limpar
+                    </button>
+                </div>
+            </div>
+            <div class="logs-container">
+                <!-- Os logs serão inseridos aqui via JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Seção de Estatísticas -->
+    <div class="row g-4">
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Uso do Sistema</h5>
+                    <canvas id="usageChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Performance</h5>
+                    <canvas id="performanceChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Banco de Dados -->
+<div class="modal fade" id="dbModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Gerenciamento do Banco de Dados</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-4">
+                    <h6>Backup e Restauração</h6>
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-primary" id="backupDb">
+                            <i class="fas fa-download me-2"></i>Fazer Backup
+                        </button>
+                        <button class="btn btn-warning" id="restoreDb">
+                            <i class="fas fa-upload me-2"></i>Restaurar Backup
+                        </button>
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <h6>Limpeza de Dados</h6>
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-danger" id="clearDb">
+                            <i class="fas fa-trash-alt me-2"></i>Limpar Base de Dados
+                        </button>
+                    </div>
+                    <small class="text-muted">Esta ação não pode ser desfeita!</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Automação -->
+<div class="modal fade" id="autoModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Configurações de Automação</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="autoConfigForm">
+                    <div class="mb-3">
+                        <label class="form-label">Intervalo de Processamento</label>
+                        <select class="form-select" name="interval">
+                            <option value="5">5 minutos</option>
+                            <option value="15">15 minutos</option>
+                            <option value="30">30 minutos</option>
+                            <option value="60">1 hora</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Limites</label>
+                        <div class="input-group mb-2">
+                            <span class="input-group-text">Máx. Arquivos</span>
+                            <input type="number" class="form-control" name="maxFiles" value="100">
+                        </div>
+                        <div class="input-group">
+                            <span class="input-group-text">Timeout (s)</span>
+                            <input type="number" class="form-control" name="timeout" value="300">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Notificações</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="emailNotif" checked>
+                            <label class="form-check-label">Email</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="systemNotif" checked>
+                            <label class="form-check-label">Sistema</label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="saveAutoConfig">Salvar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Relatórios -->
+<div class="modal fade" id="reportsModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Exportar Relatórios</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="list-group">
+                    <button class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                        Relatório Completo
+                        <i class="fas fa-file-excel text-success"></i>
+                    </button>
+                    <button class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                        Estatísticas por Estado
+                        <i class="fas fa-file-pdf text-danger"></i>
+                    </button>
+                    <button class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                        Logs do Sistema
+                        <i class="fas fa-file-csv text-primary"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.action-card {
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius);
+    padding: 1.5rem;
+    box-shadow: var(--shadow-color) 0px 2px 8px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    height: 100%;
+}
+
+.action-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-color) 0px 8px 16px;
+}
+
+.action-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    color: white;
+    margin-bottom: 1rem;
+}
+
+.action-content h4 {
+    color: var(--text-color);
+    margin-bottom: 0.5rem;
+}
+
+.logs-container {
+    background-color: var(--input-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    padding: 1rem;
+    max-height: 400px;
+    overflow-y: auto;
+    font-family: monospace;
+    font-size: 0.9rem;
+}
+
+.log-entry {
+    padding: 0.5rem;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    gap: 1rem;
+    color: var(--text-color);
+}
+
+.log-entry:last-child {
+    border-bottom: none;
+}
+
+.log-time {
+    color: var(--text-muted);
+    white-space: nowrap;
+}
+
+.log-level {
+    padding: 0.2rem 0.5rem;
+    border-radius: 3px;
+    font-size: 0.8rem;
+    white-space: nowrap;
+}
+
+.log-level.info {
+    background-color: var(--info-color);
+    color: white;
+}
+
+.log-level.warning {
+    background-color: var(--warning-color);
+    color: black;
+}
+
+.log-level.error {
+    background-color: var(--danger-color);
+    color: white;
+}
+
+.modal-content {
+    background-color: var(--card-bg);
+    color: var(--text-color);
+}
+
+.modal-header {
+    border-bottom-color: var(--border-color);
+}
+
+.modal-footer {
+    border-top-color: var(--border-color);
+}
+
+.list-group-item {
+    background-color: var(--card-bg);
+    color: var(--text-color);
+    border-color: var(--border-color);
+}
+
+.list-group-item:hover {
+    background-color: var(--state-hover);
+}
+
+.form-control, .form-select {
+    background-color: var(--input-bg);
+    color: var(--input-text);
+    border-color: var(--input-border);
+}
+
+.form-control:focus, .form-select:focus {
+    background-color: var(--input-bg);
+    color: var(--input-text);
+    border-color: var(--input-focus);
+    box-shadow: 0 0 0 0.25rem rgba(var(--primary-rgb), 0.25);
+}
+
+.input-group-text {
+    background-color: var(--card-bg);
+    color: var(--text-color);
+    border-color: var(--border-color);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in {
+    animation: fadeIn 0.3s ease-out forwards;
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Configuração de cores para tema escuro/claro
+    const isDark = document.body.classList.contains('dark-theme');
+    const textColor = isDark ? '#e1e1e1' : '#333333';
+    const gridColor = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
+
+    // Configuração global do Chart.js
+    Chart.defaults.color = textColor;
+    Chart.defaults.borderColor = gridColor;
+
+    // Gráfico de Uso do Sistema
+    const usageCtx = document.getElementById('usageChart');
+    new Chart(usageCtx, {
+        type: 'bar',
+        data: {
+            labels: ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo'],
+            datasets: [{
+                label: 'Arquivos Processados',
+                data: [65, 59, 80, 81, 56, 40, 30],
+                backgroundColor: '#3399ff'
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: gridColor
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    }
+                }
+            }
+        }
+    });
+
+    // Gráfico de Performance
+    const perfCtx = document.getElementById('performanceChart');
+    new Chart(perfCtx, {
+        type: 'line',
+        data: {
+            labels: ['12:00', '13:00', '14:00', '15:00', '16:00', '17:00'],
+            datasets: [{
+                label: 'Tempo de Resposta (ms)',
+                data: [150, 200, 175, 300, 250, 180],
+                borderColor: '#28a745',
+                tension: 0.4,
+                fill: false
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: gridColor
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    }
+                }
+            }
+        }
+    });
+
+    // Gerenciamento de Logs
+    const logsContainer = document.querySelector('.logs-container');
+    const refreshLogs = document.getElementById('refreshLogs');
+    const clearLogs = document.getElementById('clearLogs');
+
+    function carregarLogs() {
+        fetch('/api/logs')
+            .then(response => response.json())
+            .then(logs => {
+                logsContainer.innerHTML = logs.map(log => `
+                    <div class="log-entry fade-in">
+                        <span class="log-time">${new Date(log.data).toLocaleTimeString()}</span>
+                        <span class="log-level ${log.nivel.toLowerCase()}">${log.nivel}</span>
+                        <span class="log-message">${log.mensagem}</span>
+                    </div>
+                `).join('');
+            })
+            .catch(error => console.error('Erro ao carregar logs:', error));
+    }
+
+    refreshLogs.addEventListener('click', carregarLogs);
+    clearLogs.addEventListener('click', function() {
+        if (confirm('Tem certeza que deseja limpar todos os logs?')) {
+            fetch('/api/logs/clear', { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        logsContainer.innerHTML = '';
+                        alert('Logs limpos com sucesso!');
+                    }
+                })
+                .catch(error => console.error('Erro ao limpar logs:', error));
+        }
+    });
+
+    // Gerenciamento do Banco de Dados
+    const backupDb = document.getElementById('backupDb');
+    const restoreDb = document.getElementById('restoreDb');
+    const clearDb = document.getElementById('clearDb');
+
+    backupDb.addEventListener('click', function() {
+        fetch('/api/admin/backup', { method: 'POST' })
+            .then(response => response.blob())
+            .then(blob => {
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `backup_${new Date().toISOString().split('T')[0]}.sql`;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                a.remove();
+            })
+            .catch(error => console.error('Erro ao fazer backup:', error));
+    });
+
+    clearDb.addEventListener('click', function() {
+        if (confirm('ATENÇÃO: Esta ação irá limpar todos os dados do sistema. Deseja continuar?')) {
+            fetch('/api/admin/clear-database', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ confirmar: true })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Base de dados limpa com sucesso!');
+                    window.location.reload();
+                }
+            })
+            .catch(error => console.error('Erro ao limpar base de dados:', error));
+        }
+    });
+
+    // Configurações de Automação
+    const autoConfigForm = document.getElementById('autoConfigForm');
+    const saveAutoConfig = document.getElementById('saveAutoConfig');
+
+    saveAutoConfig.addEventListener('click', function() {
+        const formData = new FormData(autoConfigForm);
+        const config = {
+            interval: formData.get('interval'),
+            maxFiles: formData.get('maxFiles'),
+            timeout: formData.get('timeout'),
+            notifications: {
+                email: formData.get('emailNotif') === 'on',
+                system: formData.get('systemNotif') === 'on'
+            }
+        };
+
+        fetch('/api/admin/automation-config', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(config)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Configurações salvas com sucesso!');
+                bootstrap.Modal.getInstance(document.getElementById('autoModal')).hide();
+            }
+        })
+        .catch(error => console.error('Erro ao salvar configurações:', error));
+    });
+
+    // Carregar logs iniciais
+    carregarLogs();
+});
+</script>
+{% endblock %}

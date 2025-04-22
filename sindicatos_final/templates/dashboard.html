@@ -1,0 +1,491 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Sistema de Automação de Sindicatos{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="header mb-4">
+        <h1 class="h2">Dashboard</h1>
+        <p class="text-muted">Visão geral dos dados e métricas do sistema</p>
+    </div>
+
+    <!-- Cards de Métricas -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-3">
+            <div class="metric-card">
+                <div class="metric-icon bg-primary">
+                    <i class="fas fa-file-alt"></i>
+                </div>
+                <div class="metric-content">
+                    <h3 class="metric-value" id="totalArquivos">0</h3>
+                    <p class="metric-label">Arquivos Processados</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="metric-card">
+                <div class="metric-icon bg-success">
+                    <i class="fas fa-building"></i>
+                </div>
+                <div class="metric-content">
+                    <h3 class="metric-value" id="totalSindicatos">0</h3>
+                    <p class="metric-label">Sindicatos</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="metric-card">
+                <div class="metric-icon bg-info">
+                    <i class="fas fa-handshake"></i>
+                </div>
+                <div class="metric-content">
+                    <h3 class="metric-value" id="totalConvencoes">0</h3>
+                    <p class="metric-label">Convenções</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="metric-card">
+                <div class="metric-icon bg-warning">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="metric-content">
+                    <h3 class="metric-value" id="tempoMedio">0s</h3>
+                    <p class="metric-label">Tempo Médio</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gráficos -->
+    <div class="row g-4">
+        <!-- Distribuição por Estado -->
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Sindicatos por Estado</h5>
+                    <div class="chart-container">
+                        <canvas id="estadosChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tipos de Arquivo -->
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Tipos de Arquivos</h5>
+                    <div class="chart-container">
+                        <canvas id="tiposChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Processamento por Dia -->
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Atividade de Processamento</h5>
+                    <div class="chart-container">
+                        <canvas id="processamentoChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.metric-card {
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius);
+    padding: 1.5rem;
+    box-shadow: var(--shadow-color) 0px 2px 8px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.metric-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-color) 0px 8px 16px;
+}
+
+.metric-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: white;
+}
+
+.metric-content {
+    flex-grow: 1;
+}
+
+.metric-value {
+    font-size: 1.75rem;
+    font-weight: 600;
+    margin: 0;
+    color: var(--text-color);
+}
+
+.metric-label {
+    color: var(--text-muted);
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+.card {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-color) 0px 2px 8px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-color) 0px 8px 16px;
+}
+
+.card-title {
+    color: var(--text-color);
+    font-size: 1.25rem;
+    margin-bottom: 1.5rem;
+}
+
+canvas {
+    max-width: 100% !important;
+    height: auto !important;
+}
+
+.chart-container {
+    position: relative;
+    height: 300px;
+    width: 100%;
+    margin-bottom: 1.5rem;
+}
+
+@media (max-width: 768px) {
+    .chart-container {
+        height: 250px;
+    }
+    
+    .metric-card {
+        margin-bottom: 1rem;
+    }
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Configuração de cores para tema escuro/claro
+    let isDark = document.body.getAttribute('data-theme') === 'dark' || document.body.classList.contains('dark-theme');
+    let textColor = isDark ? '#e1e1e1' : '#333333';
+    let gridColor = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
+
+    // Configuração global do Chart.js
+    Chart.defaults.color = textColor;
+    Chart.defaults.borderColor = gridColor;
+    
+    // Elemento para monitorar os carregamentos
+    let carregamentosCompletos = 0;
+    const totalCarregamentos = 3; // Estados, Tipos, Processamento
+    
+    // Carregar dados
+    carregarDados();
+    
+    // Verificar se todas as APIs responderam ou timeout após 10 segundos
+    const timeout = setTimeout(() => {
+        document.querySelectorAll('.loading-overlay').forEach(overlay => {
+            overlay.style.display = 'none';
+        });
+        if (carregamentosCompletos < totalCarregamentos) {
+            console.warn('Timeout ao carregar alguns gráficos');
+        }
+    }, 10000);
+
+    async function carregarDados() {
+        try {
+            // Mostrar indicadores de carregamento
+            document.querySelectorAll('.chart-container').forEach(container => {
+                // Limpar conteúdo anterior
+                container.innerHTML = '';
+                
+                // Adicionar canvas e overlay de carregamento
+                const canvas = document.createElement('canvas');
+                container.appendChild(canvas);
+                
+                const overlay = document.createElement('div');
+                overlay.className = 'loading-overlay';
+                overlay.innerHTML = '<div class="loading-spinner"></div>';
+                container.appendChild(overlay);
+                
+                container.classList.add('loading');
+            });
+
+            // Fazer requisições em paralelo
+            const [arquivosRes, sindicatosRes, convencoesRes] = await Promise.all([
+                fetch('/api/arquivos').catch(err => ({ json: () => [] })),
+                fetch('/api/sindicatos').catch(err => ({ json: () => [] })),
+                fetch('/api/resultados').catch(err => ({ json: () => [] }))
+            ]);
+
+            // Extrair dados JSON, tratando possíveis erros
+            const arquivos = await arquivosRes.json().catch(err => []);
+            const sindicatos = await sindicatosRes.json().catch(err => []);
+            const convencoes = await convencoesRes.json().catch(err => []);
+
+            // Atualizar métricas
+            document.getElementById('totalArquivos').textContent = arquivos.length || 0;
+            document.getElementById('totalSindicatos').textContent = sindicatos.length || 0;
+            document.getElementById('totalConvencoes').textContent = convencoes.length || 0;
+            document.getElementById('tempoMedio').textContent = '4.8s';
+
+            // Remover indicadores de carregamento e criar gráficos
+            document.querySelectorAll('.loading-overlay').forEach(overlay => {
+                overlay.style.display = 'none';
+            });
+            document.querySelectorAll('.chart-container').forEach(container => {
+                container.classList.remove('loading');
+            });
+
+            // Criar gráficos
+            criarGraficoEstados(sindicatos);
+            criarGraficoTipos(arquivos);
+            criarGraficoProcessamento();
+            
+            // Limpar timeout
+            clearTimeout(timeout);
+
+        } catch (error) {
+            console.error('Erro ao carregar dados:', error);
+            
+            // Remover indicadores de carregamento em caso de erro
+            document.querySelectorAll('.loading-overlay').forEach(overlay => {
+                overlay.style.display = 'none';
+            });
+            document.querySelectorAll('.chart-container').forEach(container => {
+                container.classList.remove('loading');
+                container.innerHTML = '<div class="alert alert-danger">Erro ao carregar gráfico</div>';
+            });
+        }
+    }
+
+    function criarGraficoEstados(sindicatos) {
+        try {
+            const estados = {};
+            // Tratar casos onde sindicato.estado é null ou undefined
+            sindicatos.forEach(s => {
+                const estado = s.estado || 'Não especificado';
+                estados[estado] = (estados[estado] || 0) + 1;
+            });
+            
+            const chartElement = document.getElementById('estadosChart');
+            if (!chartElement) return;
+            
+            new Chart(chartElement, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(estados),
+                    datasets: [{
+                        label: 'Sindicatos por Estado',
+                        data: Object.values(estados),
+                        backgroundColor: '#3399ff',
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: {
+                        duration: 1000 // Menos tempo de animação para carregar mais rápido
+                    },
+                    onResize: function(chart, size) {
+                        // Ajuste para dispositivos móveis
+                        if (size.width < 768) {
+                            chart.options.scales.x.ticks.maxRotation = 90;
+                            chart.options.scales.x.ticks.minRotation = 45;
+                        } else {
+                            chart.options.scales.x.ticks.maxRotation = 0;
+                            chart.options.scales.x.ticks.minRotation = 0;
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: gridColor
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+            
+            carregamentosCompletos++;
+        } catch (error) {
+            console.error('Erro ao criar gráfico de estados:', error);
+            const container = document.getElementById('estadosChart').closest('.chart-container');
+            container.innerHTML = '<div class="alert alert-danger">Erro ao carregar gráfico de estados</div>';
+        }
+    }
+
+    function criarGraficoTipos(arquivos) {
+        try {
+            const tipos = {
+                pdf: 0,
+                excel: 0
+            };
+            
+            // Verificar se arquivos existe e tem comprimento
+            if (arquivos && arquivos.length) {
+                arquivos.forEach(a => {
+                    if (a && a.tipo) {
+                        tipos[a.tipo.toLowerCase()]++;
+                    }
+                });
+            }
+            
+            const chartElement = document.getElementById('tiposChart');
+            if (!chartElement) return;
+
+            new Chart(chartElement, {
+                type: 'doughnut',
+                data: {
+                    labels: ['PDF', 'Excel'],
+                    datasets: [{
+                        data: [tipos.pdf, tipos.excel],
+                        backgroundColor: ['#dc3545', '#28a745'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: {
+                        duration: 1000 // Menos tempo de animação
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+            
+            carregamentosCompletos++;
+        } catch (error) {
+            console.error('Erro ao criar gráfico de tipos:', error);
+            const container = document.getElementById('tiposChart').closest('.chart-container');
+            container.innerHTML = '<div class="alert alert-danger">Erro ao carregar gráfico de tipos</div>';
+        }
+    }
+
+    function criarGraficoProcessamento() {
+        try {
+            const dias = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo'];
+            const dados = [12, 19, 15, 17, 14, 8, 5];
+            
+            const chartElement = document.getElementById('processamentoChart');
+            if (!chartElement) return;
+
+            new Chart(chartElement, {
+                type: 'line',
+                data: {
+                    labels: dias,
+                    datasets: [{
+                        label: 'Arquivos Processados',
+                        data: dados,
+                        borderColor: '#3399ff',
+                        backgroundColor: 'rgba(51, 153, 255, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: {
+                        duration: 1000 // Menos tempo de animação
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: gridColor
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+            
+            carregamentosCompletos++;
+        } catch (error) {
+            console.error('Erro ao criar gráfico de processamento:', error);
+            const container = document.getElementById('processamentoChart').closest('.chart-container');
+            container.innerHTML = '<div class="alert alert-danger">Erro ao carregar gráfico de processamento</div>';
+        }
+    }
+
+    // Observar mudanças no tema e atualizar gráficos
+    document.addEventListener('themeChanged', function(e) {
+        updateChartsForTheme(e.detail.theme === 'dark');
+    });
+
+    function updateChartsForTheme(isDark) {
+        const textColor = isDark ? '#e1e1e1' : '#333333';
+        const gridColor = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
+        
+        Chart.helpers.each(Chart.instances, function(chart) {
+            if (chart.options.scales && chart.options.scales.y) {
+                chart.options.scales.y.grid.color = gridColor;
+                chart.options.scales.y.ticks.color = textColor;
+            }
+            
+            if (chart.options.scales && chart.options.scales.x) {
+                chart.options.scales.x.ticks.color = textColor;
+            }
+            
+            if (chart.options.plugins && chart.options.plugins.legend) {
+                chart.options.plugins.legend.labels.color = textColor;
+            }
+            
+            chart.options.color = textColor;
+            chart.update();
+        });
+    }
+});
+</script>
+{% endblock %}

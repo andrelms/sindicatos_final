@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arquivos - Automação de Sindicatos</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body data-theme="{{ request.cookies.get('theme', 'light') }}" class="{{ request.cookies.get('theme', 'light') }}-theme">
+    <!-- Theme Toggle Button -->
+    <button class="theme-toggle" id="theme-toggle">
+        <i class="fas {{ 'fa-sun' if request.cookies.get('theme') == 'dark' else 'fa-moon' }}"></i>
+    </button>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('index') }}">
+                <i class="fas fa-robot me-2"></i>Automação de Sindicatos
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link {{ 'active' if request.endpoint == 'index' }}" href="{{ url_for('index') }}">
+                            <i class="fas fa-home me-1"></i>Início
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ 'active' if request.endpoint == 'dashboard' }}" href="{{ url_for('dashboard') }}">
+                            <i class="fas fa-chart-line me-1"></i>Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ 'active' if request.endpoint == 'arquivos' }}" href="{{ url_for('arquivos') }}">
+                            <i class="fas fa-file-alt me-1"></i>Arquivos
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ 'active' if request.endpoint == 'resultados' }}" href="{{ url_for('resultados') }}">
+                            <i class="fas fa-search me-1"></i>Resultados
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ 'active' if request.endpoint == 'painel' }}" href="{{ url_for('painel') }}">
+                            <i class="fas fa-table me-1"></i>Painel
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ 'active' if request.endpoint == 'noticias' }}" href="{{ url_for('noticias') }}">
+                            <i class="fas fa-newspaper me-1"></i>Notícias
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ 'active' if request.endpoint == 'automacao' }}" href="{{ url_for('automacao') }}">
+                            <i class="fas fa-cogs me-1"></i>Automação
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ 'active' if request.endpoint == 'admin' }}" href="{{ url_for('admin') }}">
+                            <i class="fas fa-user-cog me-1"></i>Admin
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <header class="py-4 bg-light">
+        <div class="container">
+            <h1 class="mb-0"><i class="fas fa-file-alt me-2"></i>Arquivos</h1>
+        </div>
+    </header>
+
+    <!-- Upload Section -->
+    <section class="py-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4">
+                    <div class="card border-0 shadow-sm mb-4">
+                        <div class="card-header bg-white">
+                            <h5 class="mb-0">Carregar Arquivo</h5>
+                        </div>
+                        <div class="card-body">
+                            <form id="uploadForm" enctype="multipart/form-data">
+                                <div class="mb-3">
+                                    <label for="fileInput" class="form-label">Selecione um arquivo</label>
+                                    <input class="form-control" type="file" id="fileInput" name="file" accept=".pdf,.xlsx,.xls">
+                                    <div class="form-text">Formatos suportados: PDF, Excel (.xlsx, .xls)</div>
+                                </div>
+                                <div class="mb-3 form-check">
+                                    <input type="checkbox" class="form-check-input" id="processarCheck" name="processar">
+                                    <label class="form-check-label" for="processarCheck">Processar imediatamente</label>
+                                </div>
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="fas fa-upload me-2"></i>Carregar
+                                </button>
+                            </form>
+                            <div class="mt-3" id="uploadStatus" style="display: none;"></div>
+                        </div>
+                    </div>
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-white">
+                            <h5 class="mb-0">Filtros</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label for="tipoFilter" class="form-label">Tipo de Arquivo</label>
+                                <select class="form-select" id="tipoFilter">
+                                    <option value="todos">Todos</option>
+                                    <option value="pdf">PDF</option>
+                                    <option value="excel">Excel</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="statusFilter" class="form-label">Status</label>
+                                <select class="form-select" id="statusFilter">
+                                    <option value="todos">Todos</option>
+                                    <option value="processado">Processado</option>
+                                    <option value="nao_processado">Não Processado</option>
+                                </select>
+                            </div>
+                            <button id="applyFilters" class="btn btn-outline-primary w-100">
+                                <i class="fas fa-filter me-2"></i>Aplicar Filtros
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-8">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">Arquivos Carregados</h5>
+                            <button id="refreshFiles" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-sync-alt me-1"></i>Atualizar
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Nome</th>
+                                            <th>Tipo</th>
+                                            <th>Tamanho</th>
+                                            <th>Data</th>
+                                            <th>Status</th>
+                                            <th>Ações</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="filesTable">
+                                        <!-- Arquivos serão carregados via JavaScript -->
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div id="noFilesMessage" class="text-center py-4" style="display: none;">
+                                <i class="fas fa-folder-open text-muted mb-3" style="font-size: 3rem;"></i>
+                                <p class="mb-0">Nenhum arquivo encontrado. Carregue arquivos para começar.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-4">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5><i class="fas fa-robot me-2"></i>Automação de Sindicatos</h5>
+                    <p>
+                        Sistema de automação para extração e análise de dados de convenções coletivas 
+                        com inteligência artificial.
+                    </p>
+                </div>
+                <div class="col-md-3">
+                    <h5>Links Rápidos</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="{{ url_for('index') }}" class="text-white">Início</a></li>
+                        <li><a href="{{ url_for('dashboard') }}" class="text-white">Dashboard</a></li>
+                        <li><a href="{{ url_for('arquivos') }}" class="text-white">Arquivos</a></li>
+                        <li><a href="{{ url_for('automacao') }}" class="text-white">Automação</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <h5>Recursos</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="{{ url_for('resultados') }}" class="text-white">Resultados</a></li>
+                        <li><a href="{{ url_for('noticias') }}" class="text-white">Feed de Notícias</a></li>
+                        <li><a href="{{ url_for('admin') }}" class="text-white">Administração</a></li>
+                    </ul>
+                </div>
+            </div>
+            <hr class="my-3">
+            <div class="text-center">
+                <p class="mb-0">&copy; 2025 Sistema de Automação de Sindicatos. Todos os direitos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Modal de Confirmação -->
+    <div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmModalLabel">Confirmar Exclusão</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Tem certeza que deseja excluir este arquivo? Esta ação não pode ser desfeita.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Excluir</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chat Widget -->
+    <div class="chat-widget" id="chatWidget">
+        <div class="chat-button" id="chatButton">
+            <i class="fas fa-comment-dots"></i>
+        </div>
+        <div class="chat-popup" id="chatPopup">
+            <div class="chat-header">
+                <h5><i class="fas fa-robot me-2"></i>Assistente IA</h5>
+                <button class="btn-close" id="chatClose"></button>
+            </div>
+            <div class="chat-messages" id="chatMessages">
+                <div class="message bot">
+                    <div class="message-content">
+                        Olá! Sou o assistente IA do Sistema de Automação de Sindicatos. Como posso ajudar você hoje?
+                    </div>
+                </div>
+            </div>
+            <div class="chat-input">
+                <input type="text" id="chatInput" placeholder="Digite sua pergunta...">
+                <button id="chatSend">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/chat_static.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Variáveis globais
+            const filesTable = document.getElementById('filesTable');
+            const noFilesMessage = document.getElementById('noFilesMessage');
+            const uploadForm = document.getElementById('uploadForm');
+            const uploadStatus = document.getElementById('uploadStatus');
+            const fileInput = document.getElementById('fileInput');
+            const processarCheck = document.getElementById('processarCheck');
+            const tipoFilter = document.getElementById('tipoFilter');
+            const statusFilter = document.getElementById('statusFilter');
+            const applyFilters = document.getElementById('applyFilters');
+            const refreshFiles = document.getElementById('refreshFiles');
+            const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+            const confirmModal = new bootstrap.Modal(document.getElementById('confirmModal'));
+            
+            let fileToDelete = null;
+            
+            // Carregar arquivos ao iniciar
+            loadFiles();
+            
+            // Event Listeners
+            uploadForm.addEventListener('submit', handleFileUpload);
+            applyFilters.addEventListener('click', loadFiles);
+            refreshFiles.addEventListener('click', loadFiles);
+            
+            // Configurar botão de confirmar exclusão
+            confirmDeleteBtn.addEventListener('click', function() {
+                if (fileToDelete) {
+                    // Realizar a exclusão
+                    fetch(`/api/arquivos/${fileToDelete}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            return response.json();
+                        }
+                        throw new Error('Erro ao excluir arquivo');
+                    })
+                    .then(data => {
+                        // Remover da UI
+                        const row = document.getElementById(`arquivo-row-${fileToDelete}`);
+                        if (row) {
+                            row.classList.add('fade-out');
+                            setTimeout(() => {
+                                row.remove();
+                                
+                                // Verificar se a tabela está vazia
+                                if (filesTable.querySelector('tr') === null) {
+                                    noFilesMessage.style.display = 'block';
+                                }
+                            }, 300);
+                        }
+                        
+                        // Mostrar notificação
+                        showNotification('success', 'Arquivo excluído com sucesso');
+                        
+                        // Fechar modal
+                        confirmModal.hide();
+                        fileToDelete = null;
+                    })
+                    .catch(error => {
+                        console.error('Erro:', error);
+                        showNotification('error', 'Erro ao excluir arquivo');
+                        confirmModal.hide();
+                    });
+                }
+            });
+
+            // Função para lidar com envio de arquivo
+            function handleFileUpload(e) {
+                e.preventDefault();
+                
+                // Verificar se um arquivo foi selecionado
+                if (!fileInput.files.length) {
+                    showNotification('error', 'Selecione um arquivo para carregar');
+                    return;
+                }
+                
+                // Preparar dados do formulário
+                const formData = new FormData();
+                formData.append('file', fileInput.files[0]);
+                formData.append('processar', processarCheck.checked);
+                
+                // Mostrar status de carregamento
+                uploadStatus.innerHTML = `
+                    <div class="alert alert-info">
+                        <div class="d-flex align-items-center">
+                            <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+                            <span>Carregando arquivo...</span>
+                        </div>
+                    </div>
+                `;
+                uploadStatus.style.display = 'block';
+                
+                // Enviar requisição
+                fetch('/api/arquivos/upload', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Atualizar status
+                    if (data.error) {
+                        uploadStatus.innerHTML = `
+                            <div class="alert alert-danger">
+                                <i class="fas fa-exclamation-circle me-2"></i>
+                                ${data.error}
+                            </div>
+                        `;
+                        
+                        setTimeout(() => {
+                            uploadStatus.style.display = 'none';
+                        }, 5000);
+                    } else {
+                        uploadStatus.innerHTML = `
+                            <div class="alert alert-success">
+                                <i class="fas fa-check-circle me-2"></i>
+                                Arquivo carregado com sucesso!
+                            </div>
+                        `;
+                        
+                        setTimeout(() => {
+                            uploadStatus.style.display = 'none';
+                        }, 5000);
+                        
+                        // Limpar formulário
+                        uploadForm.reset();
+                        
+                        // Atualizar lista de arquivos
+                        loadFiles();
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro:', error);
+                    
+                    uploadStatus.innerHTML = `
+                        <div class="alert alert-danger">
+                            <i class="fas fa-exclamation-circle me-2"></i>
+                            Erro ao carregar arquivo. Tente novamente.
+                        </div>
+                    `;
+                    
+                    setTimeout(() => {
+                        uploadStatus.style.display = 'none';
+                    }, 5000);
+                });
+            }
+            
+            // Função para formatar bytes
+            function formatBytes(bytes, decimals = 2) {
+                if (bytes === 0) return '0 Bytes';
+                
+                const k = 1024;
+                const dm = decimals < 0 ? 0 : decimals;
+                const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+                
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+                
+                return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+            }
+            
+            // Função para formatar data
+            function formatDate(dateString) {
+                const date = new Date(dateString);
+                return date.toLocaleDateString('pt-BR', { 
+                    day: '2-digit', 
+                    month: '2-digit', 
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            }
+            
+            // Função para carregar arquivos
+            function loadFiles() {
+                // Obter filtros atuais
+                const tipoValue = tipoFilter.value;
+                const statusValue = statusFilter.value;
+                
+                // Adicionar loading indicator
+                filesTable.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="text-center py-4">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Carregando...</span>
+                            </div>
+                            <p class="mt-2 mb-0">Carregando arquivos...</p>
+                        </td>
+                    </tr>
+                `;
+                
+                fetch('/api/arquivos')
+                    .then(response => response.json())
+                    .then(data => {
+                        // Filtrar arquivos
+                        let arquivos = data;
+                        
+                        if (tipoValue !== 'todos') {
+                            arquivos = arquivos.filter(arquivo => arquivo.tipo.toLowerCase() === tipoValue);
+                        }
+                        
+                        if (statusValue !== 'todos') {
+                            const processado = statusValue === 'processado';
+                            arquivos = arquivos.filter(arquivo => arquivo.processado === processado);
+                        }
+                        
+                        // Verificar se há arquivos para exibir
+                        if (arquivos.length === 0) {
+                            noFilesMessage.style.display = 'block';
+                            filesTable.innerHTML = '';
+                        } else {
+                            noFilesMessage.style.display = 'none';
+                            
+                            // Montar tabela de arquivos com animação fade-in
+                            filesTable.innerHTML = '';
+                            arquivos.forEach((arquivo, index) => {
+                                const row = document.createElement('tr');
+                                row.id = `arquivo-row-${arquivo.id}`;
+                                row.className = 'fade-in';
+                                row.style.animationDelay = `${index * 0.05}s`;
+                                
+                                // Determinar ícone com base no tipo
+                                let fileIcon = '<i class="fas fa-file-pdf text-danger"></i>';
+                                if (arquivo.tipo.toLowerCase() === 'excel') {
+                                    fileIcon = '<i class="fas fa-file-excel text-success"></i>';
+                                }
+                                
+                                // Determinar badge de status
+                                let statusBadge = arquivo.processado 
+                                    ? '<span class="badge bg-success">Processado</span>'
+                                    : '<span class="badge bg-warning text-dark">Não Processado</span>';
+                                
+                                row.innerHTML = `
+                                    <td><a href="/arquivo/${arquivo.id}" class="arquivo-link">${fileIcon} ${arquivo.nome}</a></td>
+                                    <td><span class="badge bg-primary">${arquivo.tipo.toUpperCase()}</span></td>
+                                    <td>${formatBytes(arquivo.tamanho)}</td>
+                                    <td>${formatDate(arquivo.data_upload)}</td>
+                                    <td class="status-cell">${statusBadge}</td>
+                                    <td>
+                                        <div class="btn-group">
+                                            ${!arquivo.processado ? 
+                                                `<button class="btn btn-sm btn-success processar-btn" 
+                                                    data-id="${arquivo.id}" 
+                                                    data-tipo="${arquivo.tipo}">
+                                                    <i class="fas fa-play"></i>
+                                                </button>` : 
+                                                `<button class="btn btn-sm btn-primary" 
+                                                    onclick="location.href='/resultados?arquivo_id=${arquivo.id}'">
+                                                    <i class="fas fa-search"></i>
+                                                </button>`
+                                            }
+                                            <button class="btn btn-sm btn-danger delete-btn" data-id="${arquivo.id}">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                `;
+                                
+                                filesTable.appendChild(row);
+                            });
+                            
+                            // Adicionar eventos aos botões de processar
+                            document.querySelectorAll('.processar-btn').forEach(btn => {
+                                btn.addEventListener('click', function() {
+                                    const arquivoId = this.getAttribute('data-id');
+                                    const arquivoTipo = this.getAttribute('data-tipo');
+                                    const row = document.getElementById(`arquivo-row-${arquivoId}`);
+                                    const self = this;
+                                    
+                                    // Atualizar UI para mostrar processamento
+                                    row.classList.add('processing');
+                                    const statusCell = row.querySelector('.status-cell');
+                                    statusCell.innerHTML = `
+                                        <span class="badge bg-info text-white">
+                                            <i class="fas fa-spinner fa-spin me-1"></i> Processando
+                                        </span>
+                                    `;
+                                    
+                                    // Desabilitar botão enquanto processa
+                                    self.disabled = true;
+                                    
+                                    // Enviar solicitação para processar o arquivo
+                                    fetch(`/api/arquivos/${arquivoId}/processar`, {
+                                        method: 'POST',
+                                        headers: {
+                                            'Content-Type': 'application/json'
+                                        }
+                                    })
+                                    .then(response => response.json())
+                                    .then(data => {
+                                        if (row) {
+                                            row.classList.remove('processing');
+                                            
+                                            // Atualizar status
+                                            const statusCell = row.querySelector('.status-cell');
+                                            if (data.success) {
+                                                statusCell.innerHTML = '<span class="badge bg-success">Processado</span>';
+                                                // Atualizar botões de ação
+                                                const tdAcoes = row.querySelector('td:last-child');
+                                                tdAcoes.innerHTML = `
+                                                    <div class="btn-group">
+                                                        <button class="btn btn-sm btn-primary" 
+                                                            onclick="location.href='/resultados?arquivo_id=${arquivoId}'">
+                                                            <i class="fas fa-search"></i>
+                                                        </button>
+                                                        <button class="btn btn-sm btn-danger delete-btn" data-id="${arquivoId}">
+                                                            <i class="fas fa-trash"></i>
+                                                        </button>
+                                                    </div>
+                                                `;
+                                                // Adicionar evento ao novo botão de excluir
+                                                tdAcoes.querySelector('.delete-btn').addEventListener('click', function() {
+                                                    fileToDelete = this.getAttribute('data-id');
+                                                    confirmModal.show();
+                                                });
+                                                
+                                                // Mostrar notificação de sucesso
+                                                showNotification('success', 'Arquivo processado com sucesso');
+                                            } else {
+                                                statusCell.innerHTML = '<span class="badge bg-danger">Erro</span>';
+                                                self.disabled = false;
+                                                
+                                                // Mostrar notificação de erro
+                                                showNotification('error', data.message || 'Erro ao processar arquivo');
+                                            }
+                                        }
+                                    })
+                                    .catch(error => {
+                                        console.error('Erro:', error);
+                                        if (row) {
+                                            row.classList.remove('processing');
+                                            const statusCell = row.querySelector('.status-cell');
+                                            statusCell.innerHTML = '<span class="badge bg-danger">Erro</span>';
+                                            self.disabled = false;
+                                            
+                                            // Mostrar notificação de erro
+                                            showNotification('error', 'Erro ao processar arquivo');
+                                        }
+                                    });
+                                });
+                            });
+                            
+                            // Adicionar eventos aos botões de excluir
+                            document.querySelectorAll('.delete-btn').forEach(btn => {
+                                btn.addEventListener('click', function() {
+                                    fileToDelete = this.getAttribute('data-id');
+                                    confirmModal.show();
+                                });
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Erro ao carregar arquivos:', error);
+                        filesTable.innerHTML = `
+                            <tr>
+                                <td colspan="6" class="text-center text-danger">
+                                    <i class="fas fa-exclamation-circle me-2"></i>
+                                    Erro ao carregar arquivos. Tente novamente.
+                                </td>
+                            </tr>
+                        `;
+                    });
+            }
+            
+            // Função para mostrar notificação
+            function showNotification(type, message) {
+                // Verificar se o container de notificações existe
+                let container = document.querySelector('.notification-container');
+                if (!container) {
+                    container = document.createElement('div');
+                    container.className = 'notification-container';
+                    document.body.appendChild(container);
+                }
+                
+                // Criar notificação
+                const notification = document.createElement('div');
+                notification.className = `notification ${type}`;
+                notification.innerHTML = `
+                    <div class="notification-icon">
+                        <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+                    </div>
+                    <div class="notification-message">${message}</div>
+                `;
+                
+                // Adicionar ao container
+                container.appendChild(notification);
+                
+                // Mostrar com animação
+                setTimeout(() => {
+                    notification.classList.add('show');
+                }, 10);
+                
+                // Remover após 5 segundos
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                    setTimeout(() => {
+                        notification.remove();
+                    }, 300);
+                }, 5000);
+            }
+
+            // Configurar o botão de tema
+            const themeToggleBtn = document.getElementById('theme-toggle');
+            if (themeToggleBtn) {
+                themeToggleBtn.addEventListener('click', function() {
+                    // Obter tema atual
+                    const currentTheme = document.body.getAttribute('data-theme') || 'light';
+                    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                    
+                    // Atualizar tema
+                    document.body.setAttribute('data-theme', newTheme);
+                    document.body.classList.remove('light-theme', 'dark-theme');
+                    document.body.classList.add(newTheme + '-theme');
+                    
+                    // Atualizar ícone
+                    const themeIcon = this.querySelector('i');
+                    if (themeIcon) {
+                        themeIcon.className = newTheme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+                    }
+                    
+                    // Salvar preferência em cookies e localStorage
+                    localStorage.setItem('theme', newTheme);
+                    localStorage.setItem('preferredTheme', newTheme);
+                    document.cookie = `theme=${newTheme};path=/;max-age=31536000`; // 1 ano
+                    
+                    // Disparar evento de mudança de tema
+                    document.dispatchEvent(new CustomEvent('themeChanged', { detail: { theme: newTheme } }));
+                });
+            }
+        });
+    </script>
+</body>
+</html>

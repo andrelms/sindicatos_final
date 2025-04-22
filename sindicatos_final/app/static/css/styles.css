@@ -1,0 +1,155 @@
+/* Estilos para a Aplicação */
+
+/* Variáveis do tema */
+:root {
+    /* Cores base - Tema Claro (padrão) */
+    --primary-color: #0066cc;
+    --primary-dark: #004c99;
+    --primary-light: #3399ff;
+    --text-color: #333333;
+    --text-muted: #666666;
+    --link-color: #0066cc;
+    --link-hover: #004c99;
+    --bg-color: #f9fafc;
+    --card-bg: #ffffff;
+    --border-color: #dee2e6;
+    --input-bg: #ffffff;
+    --input-text: #333333;
+    --input-border: #ced4da;
+    --shadow-color: rgba(0, 0, 0, 0.1);
+    --transition-speed: 0.3s;
+}
+
+/* Tema Escuro */
+body[data-theme="dark"] {
+    --primary-color: #3399ff;
+    --primary-dark: #0066cc;
+    --primary-light: #66b3ff;
+    --text-color: #e1e1e1;
+    --text-muted: #999999;
+    --link-color: #3399ff;
+    --link-hover: #66b3ff;
+    --bg-color: #1a1a1a;
+    --card-bg: #2d2d2d;
+    --border-color: #404040;
+    --input-bg: #333333;
+    --input-text: #e1e1e1;
+    --input-border: #404040;
+    --shadow-color: rgba(0, 0, 0, 0.3);
+}
+
+/* Estilos Globais */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    transition: background-color var(--transition-speed), color var(--transition-speed);
+}
+
+/* Theme Toggle Button */
+.theme-toggle {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+    padding: 10px;
+    border-radius: 50%;
+    cursor: pointer;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 5px var(--shadow-color);
+    transition: transform 0.3s ease;
+}
+
+.theme-toggle:hover {
+    transform: scale(1.1);
+}
+
+.theme-toggle i {
+    transition: transform 0.2s ease;
+}
+
+/* Transições para mudança de tema */
+.theme-transition,
+.theme-transition * {
+    transition: background-color 0.3s ease,
+                color 0.3s ease,
+                border-color 0.3s ease,
+                box-shadow 0.3s ease !important;
+}
+
+/* Links */
+a {
+    color: var(--link-color);
+    text-decoration: none;
+    transition: color var(--transition-speed);
+}
+
+a:hover {
+    color: var(--link-hover);
+    text-decoration: underline;
+}
+
+/* Cards */
+.card {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+    box-shadow: 0 4px 8px var(--shadow-color);
+}
+
+/* Navbar */
+.navbar {
+    background-color: var(--card-bg) !important;
+    border-bottom: 1px solid var(--border-color);
+}
+
+body[data-theme="dark"] .navbar {
+    background-color: var(--card-bg) !important;
+}
+
+body[data-theme="dark"] .navbar-light .navbar-brand,
+body[data-theme="dark"] .navbar-light .navbar-nav .nav-link {
+    color: var(--text-color);
+}
+
+/* Footer */
+.footer {
+    background-color: var(--card-bg) !important;
+    color: var(--text-color);
+    border-top: 1px solid var(--border-color);
+}
+
+body[data-theme="dark"] .footer {
+    background-color: var(--card-bg) !important;
+}
+
+/* Elementos Bootstrap */
+.btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-dark);
+    border-color: var(--primary-dark);
+}
+
+.form-control {
+    background-color: var(--input-bg);
+    color: var(--input-text);
+    border-color: var(--input-border);
+}
+
+.text-muted {
+    color: var(--text-muted) !important;
+} 

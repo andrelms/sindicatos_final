@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Automação de Sindicatos</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body data-theme="light" class="light-theme">
+    <!-- Theme Toggle Button -->
+    <button class="theme-toggle" id="theme-toggle">
+        <i class="fas fa-moon"></i>
+    </button>
+
+    <!-- RAG Chat Button -->
+    <div class="rag-chat-button" id="rag-chat-button">
+        <i class="fas fa-robot"></i>
+    </div>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-robot me-2"></i>Automação de Sindicatos
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#" data-tab="home">
+                            <i class="fas fa-home me-1"></i>Início
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-tab="dashboard">
+                            <i class="fas fa-chart-line me-1"></i>Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-tab="files">
+                            <i class="fas fa-file-alt me-1"></i>Arquivos
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-tab="results">
+                            <i class="fas fa-search me-1"></i>Resultados
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-tab="panel">
+                            <i class="fas fa-table me-1"></i>Painel
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-tab="news">
+                            <i class="fas fa-newspaper me-1"></i>Notícias
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-tab="automation">
+                            <i class="fas fa-cogs me-1"></i>Automação
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Conteúdo das Abas -->
+    <div class="tab-content">
+        <!-- Aba Início -->
+        <div class="tab-pane fade show active" id="home">
+            <!-- Hero Section -->
+            <div class="hero-section">
+                <div class="container text-center">
+                    <h1>Sistema de Automação de Sindicatos</h1>
+                    <p class="lead">Plataforma inteligente para extração e análise de dados de convenções coletivas com inteligência artificial.</p>
+                    <div class="mt-4">
+                        <a href="#features" class="btn btn-primary">Conheça os Recursos</a>
+                        <a href="#" class="btn btn-outline-light">Documentação</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Conteúdo Principal -->
+            <main class="container py-5">
+                <section id="features" class="mb-5">
+                    <h2 class="text-center mb-4">Recursos Principais</h2>
+                    <div class="row g-4">
+                        <div class="col-md-4">
+                            <div class="card feature-card h-100">
+                                <div class="card-body text-center">
+                                    <div class="feature-icon automation-icon mb-3">
+                                        <i class="fas fa-robot"></i>
+                                    </div>
+                                    <h5 class="card-title">Automação Inteligente</h5>
+                                    <p class="card-text">Coleta automática de convenções coletivas e acordos sindicais diretamente dos sites dos sindicatos.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card feature-card h-100">
+                                <div class="card-body text-center">
+                                    <div class="feature-icon rag-icon mb-3">
+                                        <i class="fas fa-brain"></i>
+                                    </div>
+                                    <h5 class="card-title">RAG Avançado</h5>
+                                    <p class="card-text">Sistema de Retrieval Augmented Generation para consultas precisas baseadas nos documentos indexados.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card feature-card h-100">
+                                <div class="card-body text-center">
+                                    <div class="feature-icon visualization-icon mb-3">
+                                        <i class="fas fa-chart-bar"></i>
+                                    </div>
+                                    <h5 class="card-title">Visualização de Dados</h5>
+                                    <p class="card-text">Painéis interativos para visualização de dados por sindicato, estado e categoria profissional.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="about" class="mb-5">
+                    <div class="row align-items-center">
+                        <div class="col-lg-6">
+                            <h2>Sobre o Sistema</h2>
+                            <p>O Sistema de Automação de Sindicatos é uma plataforma completa para coleta, processamento e análise de dados relacionados a convenções coletivas e acordos sindicais.</p>
+                            <p>Utilizando tecnologias avançadas de inteligência artificial, como o Gemini 2.5 Pro, o sistema é capaz de extrair informações estruturadas de documentos PDF e Excel, além de monitorar sites e redes sociais de sindicatos para manter a base de dados sempre atualizada.</p>
+                            <p>Todas as informações são rastreáveis, permitindo verificar a fonte original de cada dado apresentado nos painéis e consultas.</p>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">Recursos Técnicos</h5>
+                                    <ul class="list-group list-group-flush">
+                                        <li class="list-group-item"><i class="fas fa-check text-success me-2"></i> Processamento de PDFs e arquivos Excel</li>
+                                        <li class="list-group-item"><i class="fas fa-check text-success me-2"></i> Integração com Gemini 2.5 Pro</li>
+                                        <li class="list-group-item"><i class="fas fa-check text-success me-2"></i> Sistema RAG para consultas contextualizadas</li>
+                                        <li class="list-group-item"><i class="fas fa-check text-success me-2"></i> Automação de coleta de dados</li>
+                                        <li class="list-group-item"><i class="fas fa-check text-success me-2"></i> Monitoramento de redes sociais</li>
+                                        <li class="list-group-item"><i class="fas fa-check text-success me-2"></i> Visualização de dados por estado e categoria</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </main>
+        </div>
+
+        <!-- Aba Dashboard -->
+        <div class="tab-pane fade" id="dashboard">
+            <div class="container py-5">
+                <h2 class="mb-4">Dashboard</h2>
+                <div class="row">
+                    <div class="col-md-4 mb-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Convenções por Estado</h5>
+                                <div class="placeholder-img d-flex align-items-center justify-content-center">
+                                    <i class="fas fa-chart-pie fa-3x text-muted"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Convenções por Ano</h5>
+                                <div class="placeholder-img d-flex align-items-center justify-content-center">
+                                    <i class="fas fa-chart-line fa-3x text-muted"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Sindicatos por Categoria</h5>
+                                <div class="placeholder-img d-flex align-items-center justify-content-center">
+                                    <i class="fas fa-chart-bar fa-3x text-muted"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Aba Arquivos -->
+        <div class="tab-pane fade" id="files">
+            <div class="container py-5">
+                <h2 class="mb-4">Arquivos</h2>
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">Upload de Documentos</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="fileUpload" class="form-label">Selecione um arquivo PDF ou Excel:</label>
+                            <input class="form-control" type="file" id="fileUpload">
+                        </div>
+                        <button class="btn btn-primary">Enviar</button>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Arquivos Recentes</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Nome</th>
+                                        <th>Tipo</th>
+                                        <th>Data</th>
+                                        <th>Tamanho</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Convenção Coletiva 2024-2025.pdf</td>
+                                        <td>PDF</td>
+                                        <td>22/04/2025</td>
+                                        <td>2.3 MB</td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-primary"><i class="fas fa-eye"></i></button>
+                                            <button class="btn btn-sm btn-outline-secondary"><i class="fas fa-download"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Dados Sindicatos 2025.xlsx</td>
+                                        <td>Excel</td>
+                                        <td>20/04/2025</td>
+                                        <td>1.5 MB</td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-primary"><i class="fas fa-eye"></i></button>
+                                            <button class="btn btn-sm btn-outline-secondary"><i class="fas fa-download"></i></button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Aba Resultados -->
+        <div class="tab-pane fade" id="results">
+            <div class="container py-5">
+                <h2 class="mb-4">Resultados</h2>
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Consulta RAG</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="queryInput" class="form-label">Faça uma pergunta sobre convenções coletivas:</label>
+                            <input type="text" class="form-control" id="queryInput" placeholder="Ex: Qual o valor do reajuste salarial na última convenção?">
+                        </div>
+                        <button class="btn btn-primary">Consultar</button>
+                        <div class="mt-3 p-3 border rounded bg-light">
+                            <p class="text-muted"><em>A resposta aparecerá aqui, com citação das fontes utilizadas.</em></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Aba Painel -->
+        <div class="tab-pane fade" id="panel">
+            <div class="container py-5">
+                <h2 class="mb-4">Painel de Visualização</h2>
+                <div class="row">
+                    <div class="col-md-6 mb-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Distribuição por Estado</h5>
+                                <div class="placeholder-img d-flex align-items-center justify-content-center">
+                                    <i class="fas fa-map-marked-alt fa-3x text-muted"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Estatísticas Gerais</h5>
+                                <div class="row text-center">
+                                    <div class="col-4">
+                                        <div class="display-4 fw-bold text-primary">0</div>
+                                        <div>Sindicatos</div>
+                                    </div>
+                                    <div class="col-4">
+                                        <div class="display-4 fw-bold text-success">0</div>
+                                        <div>Convenções</div>
+                                    </div>
+                                    <div class="col-4">
+                                        <div class="display-4 fw-bold text-info">0</div>
+                                        <div>Documentos</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Aba Notícias -->
+        <div class="tab-pane fade" id="news">
+            <div class="container py-5">
+                <h2 class="mb-4">Notícias dos Sindicatos</h2>
+                <div class="row">
+                    <div class="col-md-4 mb-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Últimas Atualizações</h5>
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item">
+                                        <small class="text-muted">22/04/2025</small>
+                                        <p class="mb-0">Nova convenção coletiva aprovada para o setor de tecnologia.</p>
+                                    </li>
+                                    <li class="list-group-item">
+                                        <small class="text-muted">20/04/2025</small>
+                                        <p class="mb-0">Assembleia geral marcada para discussão de reajuste salarial.</p>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-8 mb-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">Feed de Notícias</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-4 pb-3 border-bottom">
+                                    <h5>Reajuste Salarial Aprovado</h5>
+                                    <p class="text-muted">Publicado em 22/04/2025 por Sindicato dos Metalúrgicos</p>
+                                    <p>Foi aprovado o reajuste salarial de 8,5% para a categoria, válido a partir de maio de 2025.</p>
+                                </div>
+                                <div class="mb-4 pb-3 border-bottom">
+                                    <h5>Nova Convenção Coletiva</h5>
+                                    <p class="text-muted">Publicado em 20/04/2025 por Sindicato dos Bancários</p>
+                                    <p>A nova convenção coletiva foi assinada com validade de dois anos, trazendo benefícios como...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Aba Automação -->
+        <div class="tab-pane fade" id="automation">
+            <div class="container py-5">
+                <h2 class="mb-4">Automação de Coleta</h2>
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">Configuração de Automação</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label">Selecione os sindicatos para coleta automática:</label>
+                            <select class="form-select" multiple>
+                                <option>Sindicato dos Metalúrgicos</option>
+                                <option>Sindicato dos Bancários</option>
+                                <option>Sindicato dos Professores</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Frequência de coleta:</label>
+                            <select class="form-select">
+                                <option>Diária</option>
+                                <option>Semanal</option>
+                                <option>Mensal</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-primary">Iniciar Coleta</button>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Logs de Automação</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="log-container">
+                            <div class="mb-2">
+                                <span class="badge bg-info">INFO</span>
+                                <span class="ms-2">22/04/2025 15:30</span>
+                                <span class="ms-2">Iniciando coleta para Sindicato dos Metalúrgicos</span>
+                            </div>
+                            <div class="mb-2">
+                                <span class="badge bg-success">SUCCESS</span>
+                                <span class="ms-2">22/04/2025 15:32</span>
+                                <span class="ms-2">Documento encontrado: Convenção Coletiva 2025-2026</span>
+                            </div>
+                            <div class="mb-2">
+                                <span class="badge bg-warning">WARNING</span>
+                                <span class="ms-2">22/04/2025 15:35</span>
+                                <span class="ms-2">Tempo limite excedido para Sindicato dos Bancários</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- RAG Chat Popup -->
+    <div class="chat-widget">
+        <div class="chat-popup" id="chat-popup">
+            <div class="chat-header">
+                <h5 class="mb-0"><i class="fas fa-robot me-2"></i>Consulta RAG</h5>
+                <button class="btn-close btn-close-white" id="close-chat"></button>
+            </div>
+            <div class="chat-messages" id="chat-messages">
+                <div class="message bot">
+                    <div class="message-content">
+                        Olá! Sou o assistente do Sistema de Automação de Sindicatos. Como posso ajudar com informações sobre convenções coletivas?
+                    </div>
+                </div>
+            </div>
+            <div class="chat-input">
+                <input type="text" placeholder="Digite sua pergunta..." id="chat-input-field">
+                <button id="send-message"><i class="fas fa-paper-plane"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5><i class="fas fa-robot me-2"></i>Automação de Sindicatos</h5>
+                    <p>Sistema de automação para extração e análise de dados de convenções coletivas com inteligência artificial.</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p class="mb-0">&copy; 2025 Sistema de Automação de Sindicatos</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/theme.js"></script>
+    <script>
+        // Função para alternar entre abas
+        document.addEventListener('DOMContentLoaded', function() {
+            // Gerenciar navegação por abas
+            const navLinks = document.querySelectorAll('.nav-link[data-tab]');
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Remover classe active de todos os links
+                    navLinks.forEach(l => l.classList.remove('active'));
+                    
+                    // Adicionar classe active ao link clicado
+                    this.classList.add('active');
+                    
+                    // Esconder todas as abas
+                    const tabPanes = document.querySelectorAll('.tab-pane');
+                    tabPanes.forEach(pane => {
+                        pane.classList.remove('show', 'active');
+                    });
+                    
+                    // Mostrar a aba correspondente
+                    const tabId = this.getAttribute('data-tab');
+                    const tabPane = document.getElementById(tabId);
+                    if (tabPane) {
+                        tabPane.classList.add('show', 'active');
+                    }
+                });
+            });
+            
+            // Gerenciar chat RAG
+            const ragChatButton = document.getElementById('rag-chat-button');
+            const chatPopup = document.getElementById('chat-popup');
+            const closeChat = document.getElementById('close-chat');
+            
+            ragChatButton.addEventListener('click', function() {
+                chatPopup.style.display = chatPopup.style.display === 'flex' ? 'none' : 'flex';
+            });
+            
+            closeChat.addEventListener('click', function() {
+                chatPopup.style.display = 'none';
+            });
+            
+            // Simulação de envio de mensagem
+            const sendMessage = document.getElementById('send-message');
+            const chatInput = document.getElementById('chat-input-field');
+            const chatMessages = document.getElementById('chat-messages');
+            
+            sendMessage.addEventListener('click', function() {
+                if (chatInput.value.trim() === '') return;
+                
+                // Adicionar mensagem do usuário
+                const userMessage = document.createElement('div');
+                userMessage.className = 'message user';
+                userMessage.innerHTML = `<div class="message-content">${chatInput.value}</div>`;
+                chatMessages.appendChild(userMessage);
+                
+                // Simular resposta do bot após 1 segundo
+                setTimeout(() => {
+                    const botMessage = document.createElement('div');
+                    botMessage.className = 'message bot';
+                    botMessage.innerHTML = `<div class="message-content">
+                        Esta é uma resposta simulada. Em um ambiente real, o sistema RAG buscaria informações relevantes nos documentos indexados para responder à sua pergunta.
+                        <br><br>
+                        <small class="text-muted">Fonte: Simulação de demonstração</small>
+                    </div>`;
+                    chatMessages.appendChild(botMessage);
+                    
+                    // Rolar para o final da conversa
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                }, 1000);
+                
+                // Limpar campo de entrada
+                chatInput.value = '';
+                
+                // Rolar para o final da conversa
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            });
+            
+            // Permitir envio com Enter
+            chatInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    sendMessage.click();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

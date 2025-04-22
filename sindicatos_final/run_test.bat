@@ -1,0 +1,3 @@
+@echo off
+echo Iniciando teste do servidor Flask...
+python test_app.py
